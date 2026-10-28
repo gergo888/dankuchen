@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Köszönjük" description="Megkaptuk az időpontkérésedet." aktiv="idopont">
+  <section class="szekcio">
+    <div class="tarolo koszi">
+      <h1>Köszönjük!</h1>
+      <p class="bevezeto">Megkaptuk az időpontkérésedet. Hamarosan felhívunk, hogy egyeztessük az időpontot.</p>
+      <a href="/konyhak/" class="link-nyil">Addig is nézd meg a konyhákat →</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .koszi {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: flex-start;
+    min-height: 40vh;
+    justify-content: center;
+  }
+</style>

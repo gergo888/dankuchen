@@ -1,0 +1,187 @@
+/*
+ * DANKÜCHEN arculat (Markenidentität 2026)
+ * Márkafontok: Gazpacho Medium Italic (címsor), GT Walsheim Regular (szöveg).
+ * Licencköteles fájlok, ezért nincsenek a repóban: ha van webes licenc,
+ * a woff2 fájlok a public/fonts mappába kerülnek (lásd README).
+ * Tartalék: Fraunces Italic (címsor) és Montserrat (szöveg, a guideline webes tartaléka).
+ */
+@font-face {
+  font-family: 'Gazpacho';
+  src: url('/fonts/Gazpacho-MediumItalic.woff2') format('woff2');
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GT Walsheim';
+  src: url('/fonts/GT-Walsheim-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  /* Elsődleges */
+  --fekete: #000000;
+  --feher: #ffffff;
+  /* Kiemelés: csak a fő foglalás gombon */
+  --dan-piros: #e21f26;
+  /* Másodlagos paletta */
+  --panna: #eae5de;
+  --tamarillo: #9a1c1f;
+  --karamell: #d79c79;
+  --tahini: #b0a8a0;
+  --zucchini: #4c5b4c;
+  --matcha: #89998e;
+  --dark-blueberry: #2a4248;
+  /* Szövegárnyalatok (4.5:1 felett Pannán is) */
+  --szoveg: #26231f;
+  --szoveg-halvany: #3d3a36;
+  --vonal: #e3ddd5;
+
+  --font-cim: 'Gazpacho', 'Fraunces', Georgia, serif;
+  --font-szoveg: 'GT Walsheim', 'Montserrat', system-ui, sans-serif;
+  --max: 1280px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--feher);
+  color: var(--fekete);
+  font-family: var(--font-szoveg);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+a:hover {
+  color: var(--tamarillo);
+}
+
+:focus-visible {
+  outline: 2px solid var(--dan-piros);
+  outline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-cim);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.08;
+}
+h1 {
+  font-size: clamp(2.75rem, 7vw, 6rem);
+}
+h2 {
+  font-size: clamp(2.25rem, 4vw, 3.25rem);
+}
+h3 {
+  font-size: 1.875rem;
+}
+p {
+  margin: 0;
+}
+
+.tarolo {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: 32px;
+}
+@media (max-width: 640px) {
+  .tarolo {
+    padding-inline: 16px;
+  }
+}
+
+.szekcio {
+  padding-block: clamp(64px, 9vw, 120px);
+}
+.szekcio--panna {
+  background: var(--panna);
+}
+
+.felirat {
+  font-size: 0.8125rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--szoveg-halvany);
+}
+
+.bevezeto {
+  font-size: 1.1875rem;
+  line-height: 1.65;
+  color: var(--szoveg);
+  max-width: 42rem;
+}
+
+/* Gombok */
+.gomb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 28px;
+  border-radius: 2px;
+  font-family: var(--font-szoveg);
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+}
+.gomb--fo {
+  background: var(--dan-piros);
+  color: var(--feher);
+}
+.gomb--fo:hover {
+  background: var(--tamarillo);
+  color: var(--feher);
+}
+.gomb--keret {
+  border-color: currentColor;
+  font-weight: 500;
+}
+.gomb--keret:hover {
+  color: inherit;
+  background: rgb(255 255 255 / 0.12);
+}
+.link-nyil {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1.5px solid currentColor;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

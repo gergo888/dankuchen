@@ -1,0 +1,41 @@
+---
+import '@fontsource/fraunces/500-italic.css';
+import '@fontsource/montserrat/400.css';
+import '@fontsource/montserrat/500.css';
+import '@fontsource/montserrat/700.css';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  aktiv?: 'fooldal' | 'konyhak' | 'kapcsolat' | 'idopont';
+}
+
+const { title, description, aktiv } = Astro.props;
+const teljesCim = title === 'Főoldal' ? 'DANKÜCHEN Exkluzív Stúdió Kaposvár' : `${title} – DANKÜCHEN Kaposvár`;
+---
+
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{teljesCim}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={teljesCim} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content="hu_HU" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  </head>
+  <body>
+    <a class="sr-only" href="#tartalom">Ugrás a tartalomra</a>
+    <Header aktiv={aktiv} />
+    <main id="tartalom">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

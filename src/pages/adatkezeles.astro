@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import studio from '../data/studio.json';
+---
+
+<Layout title="Adatkezelési tájékoztató" description="A Lamelló Kft. adatkezelési tájékoztatója.">
+  <section class="szekcio">
+    <div class="tarolo jogi">
+      <h1>Adatkezelési tájékoztató</h1>
+      <!-- TODO: a Lamelló Kft. hivatalos adatkezelési tájékoztatójának szövege ide kerül. -->
+      <p class="bevezeto">Az adatkezelési tájékoztató szövege hamarosan elérhető. Kérdés esetén írj nekünk: <a href={`mailto:${studio.email}`}>{studio.email}</a>.</p>
+      <p>Adatkezelő: {studio.uzemelteto}, {studio.cim} · Cg. {studio.cegjegyzekszam} · Adószám: {studio.adoszam}</p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .jogi {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 800px;
+  }
+  .jogi h1 {
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+  }
+</style>

@@ -1,0 +1,102 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logok/dankuchen-fekete.png';
+
+interface Props {
+  aktiv?: string;
+}
+
+const { aktiv } = Astro.props;
+
+const menu = [
+  { id: 'fooldal', cim: 'Főoldal', href: '/' },
+  { id: 'konyhak', cim: 'Konyhák', href: '/konyhak/' },
+  { id: 'kapcsolat', cim: 'Kapcsolat', href: '/kapcsolat/' },
+];
+---
+
+<header class="fejlec">
+  <div class="tarolo fejlec__sor">
+    <a href="/" class="fejlec__marka" aria-label="DANKÜCHEN Kaposvár – főoldal">
+      <Image src={logo} alt="DANKÜCHEN" width={190} />
+      <span class="fejlec__studio">Exkluzív Stúdió<br />Kaposvár</span>
+    </a>
+    <nav aria-label="Fő navigáció" class="fejlec__menu">
+      {
+        menu.map((m) => (
+          <a href={m.href} aria-current={m.id === aktiv ? 'page' : undefined}>
+            {m.cim}
+          </a>
+        ))
+      }
+      <a href="/idopontfoglalas/" class="gomb gomb--fo" aria-current={aktiv === 'idopont' ? 'page' : undefined}>
+        Időpontot foglalok
+      </a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .fejlec {
+    background: var(--feher);
+    border-bottom: 1px solid var(--vonal);
+  }
+  .fejlec__sor {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 32px;
+    padding-block: 20px;
+  }
+  .fejlec__marka {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+  }
+  .fejlec__marka img {
+    width: 190px;
+  }
+  .fejlec__studio {
+    font-family: var(--font-cim);
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.1;
+    color: var(--tamarillo);
+  }
+  .fejlec__menu {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 28px;
+  }
+  .fejlec__menu a:not(.gomb) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .fejlec__menu a:not(.gomb)[aria-current='page'] {
+    font-weight: 700;
+    box-shadow: inset 0 -2px 0 currentColor;
+  }
+  .fejlec__menu .gomb {
+    min-height: 48px;
+    padding: 0 22px;
+    font-size: 0.9375rem;
+  }
+  @media (max-width: 640px) {
+    .fejlec__marka img {
+      width: 150px;
+    }
+    .fejlec__menu {
+      width: 100%;
+      gap: 4px 20px;
+    }
+    .fejlec__menu .gomb {
+      margin-left: auto;
+    }
+  }
+</style>

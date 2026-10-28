@@ -1,0 +1,29 @@
+{
+  "name": "dankuchen-kaposvar",
+  "version": "1.0.0",
+  "description": "DANKÜCHEN Exkluzív Stúdió Kaposvár weboldal",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gergo888/dankuchen.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gergo888/dankuchen/issues"
+  },
+  "homepage": "https://github.com/gergo888/dankuchen#readme",
+  "dependencies": {
+    "@fontsource/fraunces": "^5.3.0",
+    "@fontsource/montserrat": "^5.3.0",
+    "astro": "^7.4.2"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22.23.4"
+  }
+}

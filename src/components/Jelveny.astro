@@ -1,0 +1,41 @@
+---
+// Exkluzív stúdió jelvény (Brand Icon): Tamarillo kör, fehér logó, alatta a város.
+// A guideline szerint csak exkluzív DANKÜCHEN stúdiók használhatják.
+import { Image } from 'astro:assets';
+import logoFeher from '../assets/logok/dankuchen-feher.png';
+
+interface Props {
+  meret?: number;
+}
+
+const { meret = 112 } = Astro.props;
+---
+
+<div class="jelveny" role="img" aria-label="DANKÜCHEN Kaposvár jelvény" style={`--meret: ${meret}px`}>
+  <Image src={logoFeher} alt="" width={Math.round(meret * 0.72)} />
+  <span>Kaposvár</span>
+</div>
+
+<style>
+  .jelveny {
+    width: var(--meret);
+    height: var(--meret);
+    border-radius: 50%;
+    background: var(--tamarillo);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex: none;
+  }
+  .jelveny img {
+    width: 72%;
+  }
+  .jelveny span {
+    font-family: var(--font-cim);
+    font-style: italic;
+    font-size: calc(var(--meret) * 0.115);
+    color: var(--feher);
+  }
+</style>

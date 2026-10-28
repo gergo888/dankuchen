@@ -1,0 +1,273 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+
+const konyhak = (await getCollection('konyhak')).sort((a, b) => a.data.sorrend - b.data.sorrend);
+const reszletek = (await getCollection('reszletek')).sort((a, b) => a.data.sorrend - b.data.sorrend);
+
+const csoportNev = {
+  'fogantyu-nelkuli': 'Fogantyú nélküli',
+  fogantyus: 'Fogantyús',
+} as const;
+
+const modellek = await Promise.all(konyhak.map(async (k) => ({ k, Content: (await render(k)).Content })));
+---
+
+<Layout
+  title="Konyhák"
+  description="DANKÜCHEN konyhamodellek: Silbermond, Sevilla, Lion Classic, Andros, Living, Amica, Classico és La Corte. Mind méretre gyártva, a kaposvári exkluzív stúdióban megtekinthetők."
+  aktiv="konyhak"
+>
+  <section class="szekcio--panna">
+    <div class="tarolo fej">
+      <h1>Konyhák</h1>
+      <p class="bevezeto">
+        Minden DAN-konyha méretre készül, a te terednek és életmódodnak megfelelően. Válaszd ki a stílust, a részleteket együtt tervezzük
+        meg.
+      </p>
+      <div class="szuro" role="group" aria-label="Szűrés fogantyú szerint" hidden>
+        <button type="button" data-szuro="mind" aria-pressed="true">Összes</button>
+        <button type="button" data-szuro="fogantyu-nelkuli" aria-pressed="false">Fogantyú nélküli</button>
+        <button type="button" data-szuro="fogantyus" aria-pressed="false">Fogantyús</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="szekcio" aria-label="Konyhamodellek">
+    <div class="tarolo modellek">
+      {
+        modellek.map(({ k, Content }, i) => (
+          <article id={k.id} class:list={['modell', { 'modell--fordit': i % 2 === 1 }]} data-csoport={k.data.csoport}>
+            <div class="modell__kepek">
+              <Image src={k.data.kep} alt={k.data.kepLeiras} widths={[600, 1000, 1400]} sizes="(max-width: 900px) 100vw, 60vw" class="modell__fokep" />
+              {k.data.galeria.length > 0 && (
+                <div class="modell__galeria">
+                  {k.data.galeria.map((g) => (
+                    <Image src={g.kep} alt={g.leiras} widths={[300, 500]} sizes="(max-width: 900px) 33vw, 20vw" />
+                  ))}
+                </div>
+              )}
+            </div>
+            <div class="modell__szoveg">
+              <span class="felirat">{csoportNev[k.data.csoport]}</span>
+              <h2>{k.data.nev}</h2>
+              <p class="modell__alcim">{k.data.alcim}</p>
+              <div class="modell__leiras">
+                <Content />
+              </div>
+              <a href={`/idopontfoglalas/?modell=${encodeURIComponent(k.data.nev)}`} class="link-nyil">
+                Ilyet szeretnék – időpontfoglalás →
+              </a>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="szekcio szekcio--panna" aria-labelledby="reszletek">
+    <div class="tarolo resz">
+      <div class="resz__fej">
+        <p class="felirat">Okos részletek</p>
+        <h2 id="reszletek">Minden a helyén</h2>
+        <p class="bevezeto">A jó konyha a részleteken múlik: ezekkel a megoldásokkal minden kézre esik, és semmi sem vész kárba.</p>
+      </div>
+      <div class="resz__racs">
+        {
+          reszletek.map(async (r) => {
+            const { Content } = await render(r);
+            return (
+              <figure class="resz__elem">
+                <Image src={r.data.kep} alt={r.data.kepLeiras} widths={[400, 700]} sizes="(max-width: 640px) 100vw, 33vw" />
+                <figcaption>
+                  <strong>{r.data.cim}</strong>
+                  <Content />
+                </figcaption>
+              </figure>
+            );
+          })
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" aria-labelledby="cta">
+    <div class="tarolo cta__sor">
+      <div>
+        <h2 id="cta">Nem tudod, melyik illik hozzád?</h2>
+        <p>Hozd el a konyhád alaprajzát vagy pár fotót, és látványterven megmutatjuk, hogyan nézne ki nálad.</p>
+      </div>
+      <a href="/idopontfoglalas/" class="gomb gomb--fo">Látványtervezést kérek</a>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Szűrés fogantyú szerint. JavaScript nélkül minden modell látszik.
+  const szuro = document.querySelector<HTMLElement>('.szuro');
+  if (szuro) {
+    szuro.hidden = false;
+    const gombok = szuro.querySelectorAll<HTMLButtonElement>('button');
+    const modellek = document.querySelectorAll<HTMLElement>('.modell');
+    gombok.forEach((gomb) => {
+      gomb.addEventListener('click', () => {
+        const ertek = gomb.dataset.szuro;
+        gombok.forEach((g) => g.setAttribute('aria-pressed', String(g === gomb)));
+        modellek.forEach((m) => {
+          m.hidden = ertek !== 'mind' && m.dataset.csoport !== ertek;
+        });
+      });
+    });
+  }
+</script>
+
+<style>
+  .fej {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-block: 96px 72px;
+  }
+  .szuro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .szuro[hidden] {
+    display: none;
+  }
+  .szuro button {
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: 999px;
+    border: 1.5px solid var(--fekete);
+    background: transparent;
+    color: var(--fekete);
+    font: inherit;
+    font-size: 0.9375rem;
+    cursor: pointer;
+  }
+  .szuro button[aria-pressed='true'] {
+    background: var(--fekete);
+    color: var(--feher);
+  }
+
+  .modellek {
+    display: flex;
+    flex-direction: column;
+    gap: 112px;
+  }
+  .modell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 48px;
+    align-items: center;
+    scroll-margin-top: 24px;
+  }
+  .modell[hidden] {
+    display: none;
+  }
+  .modell--fordit {
+    flex-direction: row-reverse;
+  }
+  .modell__kepek {
+    flex: 1 1 560px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .modell__fokep {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+  }
+  .modell__galeria {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .modell__galeria img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .modell__szoveg {
+    flex: 1 1 360px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .modell__alcim {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .modell__leiras {
+    color: var(--szoveg);
+    line-height: 1.65;
+  }
+
+  .resz {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .resz__fej {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .resz__racs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px 24px;
+  }
+  .resz__elem {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .resz__elem img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .resz__elem figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.9375rem;
+    color: var(--szoveg);
+  }
+  .resz__elem strong {
+    font-size: 1.0625rem;
+    color: var(--fekete);
+  }
+
+  .cta {
+    background: var(--dark-blueberry);
+    color: var(--feher);
+    padding-block: 96px;
+  }
+  .cta__sor {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cta__sor > div {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 680px;
+  }
+  .cta p {
+    font-size: 1.125rem;
+  }
+</style>

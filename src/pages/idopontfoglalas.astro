@@ -1,0 +1,295 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import heroKep from '../assets/konyhak/amica/amica-eiche-nordic-fjord-grun.jpg';
+import studio from '../data/studio.json';
+
+const modellek = (await getCollection('konyhak')).sort((a, b) => a.data.sorrend - b.data.sorrend).map((k) => k.data.nev);
+const tel = studio.telefon.replace(/\s/g, '');
+
+// Űrlapküldés: ha be van állítva egy űrlapszolgáltatás (pl. Formspree, Netlify Forms),
+// a PUBLIC_FORM_ENDPOINT környezeti változóban add meg a címét. Enélkül az űrlap
+// a látogató levelezőprogramján keresztül küldi el az adatokat az e-mail címre.
+const vegpont = import.meta.env.PUBLIC_FORM_ENDPOINT as string | undefined;
+const action = vegpont || `mailto:${studio.email}?subject=${encodeURIComponent('Időpontfoglalás látványtervezésre')}`;
+const enctype = vegpont ? undefined : 'text/plain';
+
+const lepesek = [
+  { cim: 'Időpontfoglalás', szoveg: 'Kiválasztod a neked megfelelő napot.' },
+  { cim: 'Tervezés', szoveg: 'A bemutatóteremben megtervezzük és 3D-ben megmutatjuk a konyhát.' },
+  { cim: 'Felmérés és ajánlat', szoveg: 'Kimegyünk felmérni, és részletes, átlátható ajánlatot adunk.' },
+  { cim: 'Gyártás, kiszállítás, szerelés', szoveg: 'Ausztriában legyártjuk, házhoz szállítjuk és beszereljük.' },
+];
+---
+
+<Layout
+  title="Időpontfoglalás"
+  description="Foglalj időpontot látványtervezésre a DANKÜCHEN kaposvári exkluzív stúdiójában. 3D-s látványterv a te méreteid alapján, kötöttségek nélkül."
+  aktiv="idopont"
+>
+  <section class="hero" aria-labelledby="cim">
+    <Image src={heroKep} alt="" widths={[800, 1400, 2000]} sizes="100vw" loading="eager" class="hero__kep" />
+    <div class="tarolo hero__tartalom">
+      <p class="hero__felirat">Látványtervezés</p>
+      <h1 id="cim">Foglalj időpontot látványtervezésre</h1>
+      <p class="hero__szoveg">Egy óra, kötöttségek nélkül: elmondod, hogyan használod a konyhát, mi pedig 3D-ben megmutatjuk, hogyan nézhet ki.</p>
+    </div>
+  </section>
+
+  <section class="szekcio" aria-label="Foglalás">
+    <div class="tarolo foglalas">
+      <form class="urlap" action={action} method="post" enctype={enctype}>
+        <h2>Időpontkérés</h2>
+        <input type="hidden" name="_next" value="/koszonjuk/" />
+        <label>Név *<input type="text" name="nev" required autocomplete="name" /></label>
+        <label>Telefon *<input type="tel" name="telefon" required autocomplete="tel" placeholder="+36 …" /></label>
+        <label>E-mail *<input type="email" name="email" required autocomplete="email" /></label>
+        <label>Település<input type="text" name="telepules" autocomplete="address-level2" /></label>
+        <label>Preferált nap *<input type="date" name="nap" required /></label>
+        <label
+          >Napszak
+          <select name="napszak">
+            <option>Délelőtt (8–12)</option>
+            <option>Délután (12–16)</option>
+          </select>
+        </label>
+        <label class="teljes"
+          >Melyik modell érdekel?
+          <select name="modell" id="modell">
+            <option>Még nem tudom</option>
+            {modellek.map((m) => <option>{m}</option>)}
+          </select>
+        </label>
+        <label class="teljes"
+          >Üzenet
+          <textarea name="uzenet" rows="5" placeholder="Pl. a konyha mérete, mikorra szeretnéd, különleges kérések…"></textarea>
+        </label>
+        <label class="teljes jelolo">
+          <input type="checkbox" name="adatkezeles" value="elfogadva" required />
+          <span>Elolvastam és elfogadom az <a href="/adatkezeles/">adatkezelési tájékoztatót</a>. *</span>
+        </label>
+        <button type="submit" class="gomb gomb--fo teljes">Időpontot kérek</button>
+      </form>
+
+      <aside class="hozd">
+        <h2>Mit hozz magaddal?</h2>
+        <ul>
+          <li>a helyiség alaprajzát vagy méreteit (falak, ablakok, ajtók)</li>
+          <li>a víz-, gáz- és villanybekötések helyét, ha tudod</li>
+          <li>pár fotót a jelenlegi konyháról</li>
+          <li>inspirációs képeket, ha vannak</li>
+        </ul>
+        <div class="hozd__tel">
+          <strong>Inkább telefonálnál?</strong>
+          <a href={`tel:${tel}`}>{studio.telefon}</a>
+          <span>{studio.nyitvatartas[0].napok} {studio.nyitvatartas[0].ido}</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="szekcio szekcio--panna" aria-labelledby="folyamat">
+    <div class="tarolo folyamat">
+      <h2 id="folyamat">Így lesz meg a konyhád</h2>
+      <ol>
+        {
+          lepesek.map((l, i) => (
+            <li>
+              <span class="folyamat__szam">{i + 1}</span>
+              <h3>{l.cim}</h3>
+              <p>{l.szoveg}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // A Konyhák oldalról érkezve (?modell=Silbermond) előre kiválasztja a modellt.
+  const modell = new URLSearchParams(location.search).get('modell');
+  const lista = document.querySelector<HTMLSelectElement>('#modell');
+  if (modell && lista && [...lista.options].some((o) => o.value === modell)) {
+    lista.value = modell;
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--dark-blueberry);
+    color: var(--feher);
+  }
+  .hero__kep {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 0.5);
+  }
+  .hero__tartalom {
+    position: relative;
+    z-index: 1;
+    padding-block: 120px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .hero__felirat {
+    font-size: 0.875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    max-width: 860px;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+  }
+  .hero__szoveg {
+    font-size: 1.25rem;
+    max-width: 640px;
+  }
+
+  .foglalas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 64px;
+    align-items: flex-start;
+  }
+  .urlap {
+    flex: 1 1 560px;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+  }
+  .urlap h2 {
+    grid-column: 1 / -1;
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+  }
+  .urlap label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+  .urlap .teljes {
+    grid-column: 1 / -1;
+  }
+  .urlap input:not([type='checkbox']),
+  .urlap select,
+  .urlap textarea {
+    min-height: 52px;
+    padding: 0 16px;
+    border: 1.5px solid #8a837b;
+    border-radius: 2px;
+    background: var(--feher);
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--fekete);
+  }
+  .urlap textarea {
+    padding-block: 14px;
+    resize: vertical;
+  }
+  .urlap .jelolo {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .jelolo input {
+    width: 22px;
+    height: 22px;
+    margin: 1px 0 0;
+    flex: none;
+  }
+  .urlap button {
+    justify-self: start;
+    min-height: 56px;
+    padding: 0 36px;
+    font-size: 1.0625rem;
+  }
+
+  .hozd {
+    flex: 1 1 360px;
+    min-width: 0;
+    background: var(--panna);
+    padding: 40px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .hozd h2 {
+    font-size: 2rem;
+  }
+  .hozd ul {
+    margin: 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .hozd__tel {
+    border-top: 1px solid var(--tahini);
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.9375rem;
+  }
+  .hozd__tel a {
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .folyamat {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .folyamat ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 32px;
+  }
+  .folyamat li {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-top: 2px solid var(--fekete);
+    padding-top: 20px;
+  }
+  .folyamat__szam {
+    font-family: var(--font-cim);
+    font-style: italic;
+    font-size: 2.75rem;
+    line-height: 1;
+    color: var(--tamarillo);
+  }
+  .folyamat h3 {
+    font-family: var(--font-szoveg);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 1.1875rem;
+  }
+  .folyamat p {
+    color: var(--szoveg);
+  }
+</style>

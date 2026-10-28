@@ -1,0 +1,116 @@
+---
+import { Image } from 'astro:assets';
+import logoFeher from '../assets/logok/dankuchen-feher.png';
+import lamelloLogo from '../assets/logok/lamello.png';
+import studio from '../data/studio.json';
+
+const ev = new Date().getFullYear();
+const tel = studio.telefon.replace(/\s/g, '');
+---
+
+<footer class="lablec">
+  <div class="lablec__studio">
+    <div class="tarolo lablec__studio-sor">
+      <div class="lablec__marka">
+        <Image src={logoFeher} alt="DANKÜCHEN" width={260} />
+        <span>Exkluzív Stúdió Kaposvár</span>
+      </div>
+      <p class="lablec__szlogen">Akkor vagyunk elégedettek, ha te is az vagy.</p>
+    </div>
+  </div>
+  <div class="lablec__also">
+    <div class="tarolo lablec__racs">
+      <div>
+        <h2>Bemutatóterem</h2>
+        <p>{studio.cim}</p>
+        {studio.nyitvatartas.map((n) => <p>{n.napok}: {n.ido}</p>)}
+      </div>
+      <div>
+        <h2>Elérhetőség</h2>
+        <p><a href={`tel:${tel}`}>{studio.telefon}</a></p>
+        <p><a href={`mailto:${studio.email}`}>{studio.email}</a></p>
+      </div>
+      <nav aria-label="Lábléc navigáció">
+        <h2>Oldalak</h2>
+        <p><a href="/">Főoldal</a></p>
+        <p><a href="/konyhak/">Konyhák</a></p>
+        <p><a href="/kapcsolat/">Kapcsolat</a></p>
+        <p><a href="/idopontfoglalas/">Időpontfoglalás</a></p>
+      </nav>
+      <div>
+        <h2>Üzemeltető</h2>
+        <Image src={lamelloLogo} alt="Lamelló" width={96} />
+        <p>{studio.uzemelteto} · 1993 óta Kaposváron</p>
+      </div>
+    </div>
+    <div class="tarolo lablec__jogi">
+      <span>© {ev} {studio.uzemelteto} · Cg. {studio.cegjegyzekszam} · Adószám: {studio.adoszam}</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .lablec__studio {
+    background: var(--tamarillo);
+    color: var(--feher);
+  }
+  .lablec__studio-sor {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding-block: 40px;
+  }
+  .lablec__marka {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lablec__marka img {
+    width: 260px;
+  }
+  .lablec__szlogen {
+    font-family: var(--font-cim);
+    font-style: italic;
+    font-size: 1.625rem;
+    line-height: 1.25;
+    max-width: 32rem;
+  }
+  .lablec__also {
+    background: var(--panna);
+  }
+  .lablec__racs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 40px;
+    padding-block: 56px 32px;
+    font-size: 0.9375rem;
+  }
+  .lablec__racs > * {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lablec__racs h2 {
+    font-family: var(--font-szoveg);
+    font-style: normal;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .lablec__racs a {
+    text-decoration: none;
+  }
+  .lablec__racs img {
+    width: 96px;
+  }
+  .lablec__jogi {
+    border-top: 1px solid #cfc7bc;
+    padding-block: 20px 32px;
+    font-size: 0.8125rem;
+    color: var(--szoveg-halvany);
+  }
+</style>

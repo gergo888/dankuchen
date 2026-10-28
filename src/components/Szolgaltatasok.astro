@@ -1,0 +1,66 @@
+---
+import { getCollection, render } from 'astro:content';
+import Ikon from './Ikon.astro';
+
+const szolgaltatasok = (await getCollection('szolgaltatasok')).sort((a, b) => a.data.sorrend - b.data.sorrend);
+---
+
+<section class="szekcio szekcio--panna" aria-labelledby="szolgaltatasok-cim">
+  <div class="tarolo szolg">
+    <div class="szolg__fej">
+      <p class="felirat">Szolgáltatásaink</p>
+      <h2 id="szolgaltatasok-cim">Tervezéstől a kész konyháig</h2>
+    </div>
+    <div class="szolg__racs">
+      {
+        szolgaltatasok.map(async (s, i) => {
+          const { Content } = await render(s);
+          return (
+            <article class="szolg__kartya">
+              <Ikon nev={s.data.ikon} />
+              <span class="szolg__szam">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{s.data.cim}</h3>
+              <div class="szolg__szoveg">
+                <Content />
+              </div>
+            </article>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .szolg {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .szolg__fej {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .szolg__racs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+  .szolg__kartya {
+    background: var(--feher);
+    padding: 40px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .szolg__szam {
+    font-size: 0.875rem;
+    color: var(--szoveg-halvany);
+  }
+  .szolg__szoveg {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--szoveg);
+  }
+</style>

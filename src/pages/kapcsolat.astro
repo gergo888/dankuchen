@@ -1,0 +1,173 @@
+---
+import { Image } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import lamelloLogo from '../assets/logok/lamello.png';
+import studio from '../data/studio.json';
+
+const lamello = await getEntry('szovegek', 'lamello');
+if (!lamello) throw new Error('Hiányzik: src/content/szovegek/lamello.md');
+const { Content: LamelloSzoveg } = await render(lamello);
+const tel = studio.telefon.replace(/\s/g, '');
+---
+
+<Layout
+  title="Kapcsolat"
+  description="DANKÜCHEN Exkluzív Stúdió Kaposvár: 7400 Kaposvár, Dombóvári út 1. Nyitvatartás, telefon, e-mail és térkép."
+  aktiv="kapcsolat"
+>
+  <section class="szekcio--panna">
+    <div class="tarolo fej">
+      <h1>Kapcsolat</h1>
+      <p class="bevezeto">Kérdésed van, vagy szeretnéd élőben megnézni a konyhákat? Keress minket bizalommal.</p>
+    </div>
+  </section>
+
+  <section class="szekcio" aria-label="Elérhetőségek és térkép">
+    <div class="tarolo adatok">
+      <div class="adatok__lista">
+        <div class="adat">
+          <h2>Bemutatóterem</h2>
+          <p class="adat__cim">{studio.cim}</p>
+          <a href={studio.terkepLink} class="link-nyil" target="_blank" rel="noopener">Útvonaltervezés Google Térképen →</a>
+        </div>
+        <div class="adat">
+          <h2>Nyitvatartás</h2>
+          {studio.nyitvatartas.map((n) => <p>{n.napok}: {n.ido}</p>)}
+        </div>
+        <div class="adat">
+          <h2>Telefon és e-mail</h2>
+          <a href={`tel:${tel}`} class="adat__tel">{studio.telefon}</a>
+          <a href={`mailto:${studio.email}`}>{studio.email}</a>
+        </div>
+        <div class="adat adat--doboz">
+          <h2>Kapcsolattartó</h2>
+          <p class="adat__nev">{studio.kapcsolattarto.nev}</p>
+          <p class="adat__beosztas">{studio.kapcsolattarto.beosztas}</p>
+        </div>
+      </div>
+      <iframe
+        class="terkep"
+        src={studio.terkepBeagyazas}
+        title={`Térkép: ${studio.cim}`}
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+  </section>
+
+  <section class="szekcio szekcio--panna" aria-labelledby="rolunk">
+    <div class="tarolo rolunk">
+      <div class="rolunk__logo">
+        <Image src={lamelloLogo} alt="Lamelló logó" width={220} />
+      </div>
+      <div class="rolunk__szoveg">
+        <p class="felirat">Rólunk</p>
+        <h2 id="rolunk">{lamello.data.cim}</h2>
+        <div class="rolunk__torzs">
+          <LamelloSzoveg />
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .fej {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-block: 96px 72px;
+  }
+  .adatok {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 56px;
+  }
+  .adatok__lista {
+    flex: 1 1 380px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+  .adat {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 1.125rem;
+  }
+  .adat h2 {
+    font-family: var(--font-szoveg);
+    font-style: normal;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .adat__cim {
+    font-family: var(--font-cim);
+    font-style: italic;
+    font-size: 1.875rem;
+    line-height: 1.25;
+  }
+  .adat__tel {
+    font-size: 1.375rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .adat--doboz {
+    background: var(--panna);
+    padding: 24px;
+    align-self: stretch;
+  }
+  .adat__nev {
+    font-weight: 700;
+  }
+  .adat__beosztas {
+    font-size: 0.9375rem;
+    color: var(--szoveg-halvany);
+  }
+  .terkep {
+    flex: 1 1 560px;
+    min-width: 0;
+    min-height: 520px;
+    border: 0;
+    background: var(--tahini);
+  }
+  @media (max-width: 640px) {
+    .terkep {
+      min-height: 360px;
+    }
+  }
+  .rolunk {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 64px;
+    align-items: center;
+  }
+  .rolunk__logo {
+    flex: 0 1 280px;
+    display: flex;
+    justify-content: center;
+  }
+  .rolunk__logo img {
+    width: 220px;
+  }
+  .rolunk__szoveg {
+    flex: 1 1 520px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .rolunk__torzs {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--szoveg);
+  }
+</style>
