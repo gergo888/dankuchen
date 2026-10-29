@@ -55,3 +55,13 @@ Amíg nincsenek ott, az oldal a tartalék fontokat használja: Fraunces Italic (
 ## Időpontfoglaló űrlap
 
 Alapból a látogató levelezőprogramján keresztül küldi el az adatokat a `studio.json` e-mail címére. Megbízhatóbb egy űrlapszolgáltatás (pl. Formspree): a címét a `PUBLIC_FORM_ENDPOINT` környezeti változóban add meg (lásd `.env.example`), siker után a `/koszonjuk/` oldalra irányít.
+
+## Régi CPU-s szerver (sharp nélkül)
+
+A képoptimalizáló `sharp` előre fordított változata x86-64-v2 processzort igényel. Ha a szerveren a `node -e "require('sharp')"` „Unsupported CPU” hibát ad, a dev szervert így indítsd:
+
+```sh
+SHARP_NELKUL=1 npm run dev
+```
+
+Ekkor a képek optimalizálás nélkül jelennek meg. Az éles buildet (`npm run build`) olyan gépen készítsd, ahol a sharp fut, és a `dist/` mappát töltsd fel a szerverre: az oldal statikus, kiszolgálásához nem kell Node.
