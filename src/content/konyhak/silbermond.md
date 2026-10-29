@@ -1,7 +1,7 @@
 ---
 nev: Silbermond
 alcim: Stílusos minimalizmus
-csoport: fogantyu-nelkuli
+csoportok: [fogantyu-nelkuli]
 sorrend: 1
 fooldalon: true
 kep: ../../assets/konyhak/silbermond/silbermond-eiche-nordic-anthrazit.jpg

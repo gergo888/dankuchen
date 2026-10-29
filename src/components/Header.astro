@@ -1,4 +1,5 @@
 ---
+import { url } from '../utils/url';
 import { Image } from 'astro:assets';
 import logo from '../assets/logok/dankuchen-fekete.png';
 
@@ -9,15 +10,15 @@ interface Props {
 const { aktiv } = Astro.props;
 
 const menu = [
-  { id: 'fooldal', cim: 'Főoldal', href: '/' },
-  { id: 'konyhak', cim: 'Konyhák', href: '/konyhak/' },
-  { id: 'kapcsolat', cim: 'Kapcsolat', href: '/kapcsolat/' },
+  { id: 'fooldal', cim: 'Főoldal', href: url('/') },
+  { id: 'konyhak', cim: 'Konyhák', href: url('/konyhak/') },
+  { id: 'kapcsolat', cim: 'Kapcsolat', href: url('/kapcsolat/') },
 ];
 ---
 
 <header class="fejlec">
   <div class="tarolo fejlec__sor">
-    <a href="/" class="fejlec__marka" aria-label="DANKÜCHEN Kaposvár – főoldal">
+    <a href={url('/')} class="fejlec__marka" aria-label="DANKÜCHEN Kaposvár – főoldal">
       <Image src={logo} alt="DANKÜCHEN" width={190} />
       <span class="fejlec__studio">Exkluzív Stúdió<br />Kaposvár</span>
     </a>
@@ -29,7 +30,7 @@ const menu = [
           </a>
         ))
       }
-      <a href="/idopontfoglalas/" class="gomb gomb--fo" aria-current={aktiv === 'idopont' ? 'page' : undefined}>
+      <a href={url('/idopontfoglalas/')} class="gomb gomb--fo" aria-current={aktiv === 'idopont' ? 'page' : undefined}>
         Időpontot foglalok
       </a>
     </nav>

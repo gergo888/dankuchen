@@ -5,6 +5,3 @@ dist/
 .env.*
 !.env.example
 .DS_Store
-# Licensed brand fonts are not committed (see README)
-public/fonts/*.woff2
-public/fonts/*.otf

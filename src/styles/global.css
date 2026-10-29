@@ -1,23 +1,10 @@
 /*
  * DANKÜCHEN arculat (Markenidentität 2026)
  * Márkafontok: Gazpacho Medium Italic (címsor), GT Walsheim Regular (szöveg).
- * Licencköteles fájlok, ezért nincsenek a repóban: ha van webes licenc,
- * a woff2 fájlok a public/fonts mappába kerülnek (lásd README).
- * Tartalék: Fraunces Italic (címsor) és Montserrat (szöveg, a guideline webes tartaléka).
+ * A woff2 fájlok a public/fonts mappában vannak (lásd README),
+ * a @font-face szabályok és az előtöltés a Layout.astro <head> részében.
+ * Tartalék: rendszerfontok, hogy ne töltődjön le külön webfont is.
  */
-@font-face {
-  font-family: 'Gazpacho';
-  src: url('/fonts/Gazpacho-MediumItalic.woff2') format('woff2');
-  font-style: italic;
-  font-weight: 500;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'GT Walsheim';
-  src: url('/fonts/GT-Walsheim-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-display: swap;
-}
 
 :root {
   /* Elsődleges */
@@ -38,8 +25,8 @@
   --szoveg-halvany: #3d3a36;
   --vonal: #e3ddd5;
 
-  --font-cim: 'Gazpacho', 'Fraunces', Georgia, serif;
-  --font-szoveg: 'GT Walsheim', 'Montserrat', system-ui, sans-serif;
+  --font-cim: 'Gazpacho', Georgia, serif;
+  --font-szoveg: 'GT Walsheim', system-ui, sans-serif;
   --max: 1280px;
 }
 

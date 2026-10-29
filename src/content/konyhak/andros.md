@@ -1,7 +1,7 @@
 ---
 nev: Andros
 alcim: Letisztult elegancia
-csoport: fogantyus
+csoportok: [fogantyus]
 sorrend: 3
 kep: ../../assets/konyhak/andros/andros-savona-cerros-quarz.jpg
 kepLeiras: Andros konyha Savona és Cerros színben, kvarc munkalappal

@@ -1,7 +1,7 @@
 ---
 nev: Amica
 alcim: Főzés, lakás és munka egy térben
-csoport: fogantyus
+csoportok: [fogantyus, kis-meretu]
 sorrend: 5
 kep: ../../assets/konyhak/amica/amica-eiche-nordic-fjord-grun.jpg
 kepLeiras: Amica konyha Eiche Nordic és fjordzöld frontokkal

@@ -1,7 +1,7 @@
 ---
 nev: Lion Classic
 alcim: Elegáns keretes megjelenés
-csoport: fogantyu-nelkuli
+csoportok: [fogantyu-nelkuli, videkies]
 sorrend: 8
 kep: ../../assets/konyhak/lion-classic/lion-classic-1.jpg
 kepLeiras: Lion Classic konyha világos keretes frontokkal, szigettel

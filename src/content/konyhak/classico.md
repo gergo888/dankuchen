@@ -1,7 +1,7 @@
 ---
 nev: Classico
 alcim: Újragondolt vidéki konyha
-csoport: fogantyus
+csoportok: [fogantyus, videkies]
 sorrend: 6
 fooldalon: true
 kep: ../../assets/konyhak/classico/classico-noridic-eiche-fjord-grun-schrag-fin.jpg

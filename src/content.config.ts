@@ -9,7 +9,8 @@ const konyhak = defineCollection({
     z.object({
       nev: z.string(),
       alcim: z.string(),
-      csoport: z.enum(['fogantyu-nelkuli', 'fogantyus']),
+      // Egy modell több csoportba is tartozhat (pl. fogantyús és vidékies).
+      csoportok: z.array(z.enum(['fogantyu-nelkuli', 'fogantyus', 'videkies', 'kis-meretu'])).min(1),
       sorrend: z.number(),
       fooldalon: z.boolean().default(false),
       kep: image(),

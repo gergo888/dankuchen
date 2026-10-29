@@ -1,7 +1,7 @@
 ---
 nev: Sevilla
 alcim: Extra tárolóhely
-csoport: fogantyu-nelkuli
+csoportok: [fogantyu-nelkuli]
 sorrend: 2
 kep: ../../assets/konyhak/sevilla/sevilla-nordic-eiche-1-fin.jpg
 kepLeiras: Sevilla konyha Eiche Nordic frontokkal

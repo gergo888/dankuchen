@@ -1,8 +1,5 @@
 ---
-import '@fontsource/fraunces/500-italic.css';
-import '@fontsource/montserrat/400.css';
-import '@fontsource/montserrat/500.css';
-import '@fontsource/montserrat/700.css';
+import { url } from '../utils/url';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -15,6 +12,25 @@ interface Props {
 
 const { title, description, aktiv } = Astro.props;
 const teljesCim = title === 'Főoldal' ? 'DANKÜCHEN Exkluzív Stúdió Kaposvár' : `${title} – DANKÜCHEN Kaposvár`;
+
+// Márkafontok (public/fonts, lásd README). Itt és nem a global.css-ben, mert a CSS-beli
+// abszolút útvonal nem követné a `base` beállítást.
+const fontCim = url('/fonts/Gazpacho-MediumItalic.woff2');
+const fontSzoveg = url('/fonts/GT-Walsheim-Regular.woff2');
+const fontFace = `
+@font-face {
+  font-family: 'Gazpacho';
+  src: url('${fontCim}') format('woff2');
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GT Walsheim';
+  src: url('${fontSzoveg}') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}`;
 ---
 
 <!doctype html>
@@ -27,8 +43,11 @@ const teljesCim = title === 'Főoldal' ? 'DANKÜCHEN Exkluzív Stúdió Kaposvá
     <meta property="og:title" content={teljesCim} />
     <meta property="og:description" content={description} />
     <meta property="og:locale" content="hu_HU" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href={url('/favicon.png')} />
+    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />
+    <link rel="preload" href={fontSzoveg} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fontCim} as="font" type="font/woff2" crossorigin />
+    <style is:inline set:html={fontFace} />
   </head>
   <body>
     <a class="sr-only" href="#tartalom">Ugrás a tartalomra</a>

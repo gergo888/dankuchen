@@ -1,4 +1,5 @@
 ---
+import { url } from '../utils/url';
 import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
@@ -9,6 +10,8 @@ const reszletek = (await getCollection('reszletek')).sort((a, b) => a.data.sorre
 const csoportNev = {
   'fogantyu-nelkuli': 'Fogantyú nélküli',
   fogantyus: 'Fogantyús',
+  videkies: 'Vidékies',
+  'kis-meretu': 'Kis méretű',
 } as const;
 
 const modellek = await Promise.all(konyhak.map(async (k) => ({ k, Content: (await render(k)).Content })));
@@ -26,10 +29,15 @@ const modellek = await Promise.all(konyhak.map(async (k) => ({ k, Content: (awai
         Minden DAN-konyha méretre készül, a te terednek és életmódodnak megfelelően. Válaszd ki a stílust, a részleteket együtt tervezzük
         meg.
       </p>
-      <div class="szuro" role="group" aria-label="Szűrés fogantyú szerint" hidden>
+      <div class="szuro" role="group" aria-label="Szűrés csoport szerint" hidden>
         <button type="button" data-szuro="mind" aria-pressed="true">Összes</button>
-        <button type="button" data-szuro="fogantyu-nelkuli" aria-pressed="false">Fogantyú nélküli</button>
-        <button type="button" data-szuro="fogantyus" aria-pressed="false">Fogantyús</button>
+        {
+          Object.entries(csoportNev).map(([kulcs, nev]) => (
+            <button type="button" data-szuro={kulcs} aria-pressed="false">
+              {nev}
+            </button>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -38,7 +46,7 @@ const modellek = await Promise.all(konyhak.map(async (k) => ({ k, Content: (awai
     <div class="tarolo modellek">
       {
         modellek.map(({ k, Content }, i) => (
-          <article id={k.id} class:list={['modell', { 'modell--fordit': i % 2 === 1 }]} data-csoport={k.data.csoport}>
+          <article id={k.id} class:list={['modell', { 'modell--fordit': i % 2 === 1 }]} data-csoportok={k.data.csoportok.join(' ')}>
             <div class="modell__kepek">
               <Image src={k.data.kep} alt={k.data.kepLeiras} widths={[600, 1000, 1400]} sizes="(max-width: 900px) 100vw, 60vw" class="modell__fokep" />
               {k.data.galeria.length > 0 && (
@@ -50,15 +58,12 @@ const modellek = await Promise.all(konyhak.map(async (k) => ({ k, Content: (awai
               )}
             </div>
             <div class="modell__szoveg">
-              <span class="felirat">{csoportNev[k.data.csoport]}</span>
+              <span class="felirat">{k.data.csoportok.map((c) => csoportNev[c]).join(' · ')}</span>
               <h2>{k.data.nev}</h2>
               <p class="modell__alcim">{k.data.alcim}</p>
               <div class="modell__leiras">
                 <Content />
               </div>
-              <a href={`/idopontfoglalas/?modell=${encodeURIComponent(k.data.nev)}`} class="link-nyil">
-                Ilyet szeretnék – időpontfoglalás →
-              </a>
             </div>
           </article>
         ))
@@ -98,13 +103,13 @@ const modellek = await Promise.all(konyhak.map(async (k) => ({ k, Content: (awai
         <h2 id="cta">Nem tudod, melyik illik hozzád?</h2>
         <p>Hozd el a konyhád alaprajzát vagy pár fotót, és látványterven megmutatjuk, hogyan nézne ki nálad.</p>
       </div>
-      <a href="/idopontfoglalas/" class="gomb gomb--fo">Látványtervezést kérek</a>
+      <a href={url('/idopontfoglalas/')} class="gomb gomb--fo">Látványtervezést kérek</a>
     </div>
   </section>
 </Layout>
 
 <script>
-  // Szűrés fogantyú szerint. JavaScript nélkül minden modell látszik.
+  // Szűrés csoport szerint (egy modell több csoportban is lehet). JavaScript nélkül minden modell látszik.
   const szuro = document.querySelector<HTMLElement>('.szuro');
   if (szuro) {
     szuro.hidden = false;
@@ -115,7 +120,7 @@ const modellek = await Promise.all(konyhak.map(async (k) => ({ k, Content: (awai
         const ertek = gomb.dataset.szuro;
         gombok.forEach((g) => g.setAttribute('aria-pressed', String(g === gomb)));
         modellek.forEach((m) => {
-          m.hidden = ertek !== 'mind' && m.dataset.csoport !== ertek;
+          m.hidden = ertek !== 'mind' && !m.dataset.csoportok?.split(' ').includes(ertek!);
         });
       });
     });

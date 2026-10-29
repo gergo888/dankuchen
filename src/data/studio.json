@@ -5,12 +5,12 @@
   "terkepLink": "https://www.google.com/maps/search/?api=1&query=Kaposv%C3%A1r%2C+Domb%C3%B3v%C3%A1ri+%C3%BAt+1.",
   "terkepBeagyazas": "https://www.google.com/maps?q=Kaposv%C3%A1r%2C+Domb%C3%B3v%C3%A1ri+%C3%BAt+1.&output=embed",
   "nyitvatartas": [
-    { "napok": "Hétfő–péntek", "ido": "8:00–16:00" },
-    { "napok": "Szombat–vasárnap", "ido": "előzetes egyeztetéssel" }
+    { "napok": "Hétfő–péntek", "ido": "8:00–16:00" }
   ],
   "telefon": "+36 20 473 2443",
-  "email": "megrendeles@lamello.hu",
-  "kapcsolattarto": { "nev": "Dévai-Szita Gerda", "beosztas": "értékesítési koordinátor" },
+  "email": "dan@lamello.hu",
+  "foglalasUrlap": "https://formspree.io/f/mqpplgjw",
+  "kapcsolattarto": { "nev": "Cséfalvay Balázs", "beosztas": "értékestő" },
   "cegjegyzekszam": "14-09-300484",
   "adoszam": "11223717-2-14"
 }

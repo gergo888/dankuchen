@@ -1,4 +1,5 @@
 ---
+import { url } from '../utils/url';
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
@@ -39,8 +40,8 @@ const elonyok = [
       <p class="hero__szoveg">DANKÜCHEN – Ausztria legtöbbet vásárolt konyhája, most exkluzív stúdióban Kaposváron.</p>
       <p class="hero__szlogen">Méretre szabott · egyedi · tartós</p>
       <div class="hero__gombok">
-        <a href="/idopontfoglalas/" class="gomb gomb--fo">Időpontot foglalok</a>
-        <a href="/konyhak/" class="gomb gomb--keret">Konyhák megtekintése</a>
+        <a href={url('/idopontfoglalas/')} class="gomb gomb--fo">Időpontot foglalok</a>
+        <a href={url('/konyhak/')} class="gomb gomb--keret">Konyhák megtekintése</a>
       </div>
     </div>
   </section>
@@ -90,12 +91,12 @@ const elonyok = [
           <h2 id="stilus">Találd meg a stílusodat</h2>
           <p class="bevezeto">Minimalista, családi vagy vidéki: nyolc DAN-modell, számtalan szín- és anyagkombinációban.</p>
         </div>
-        <a href="/konyhak/" class="link-nyil">Összes konyha →</a>
+        <a href={url('/konyhak/')} class="link-nyil">Összes konyha →</a>
       </div>
       <div class="stilus__racs">
         {
           kiemelt.map((k) => (
-            <a href={`/konyhak/#${k.id}`} class="kartya">
+            <a href={url(`/konyhak/#${k.id}`)} class="kartya">
               <Image src={k.data.kep} alt={k.data.kepLeiras} widths={[400, 800]} sizes="(max-width: 640px) 100vw, 25vw" />
               <span class="kartya__nev">{k.data.nev}</span>
               <span class="kartya__alcim">{k.data.alcim}</span>
@@ -119,7 +120,7 @@ const elonyok = [
         <p>
           {studio.cim}<br />{studio.nyitvatartas[0].napok} {studio.nyitvatartas[0].ido}
         </p>
-        <a href="/idopontfoglalas/" class="gomb gomb--fo">Időpontot foglalok</a>
+        <a href={url('/idopontfoglalas/')} class="gomb gomb--fo">Időpontot foglalok</a>
       </div>
     </div>
   </section>

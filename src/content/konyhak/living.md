@@ -1,7 +1,7 @@
 ---
 nev: Living
 alcim: Családi konyha mindenkinek
-csoport: fogantyus
+csoportok: [fogantyus]
 sorrend: 4
 fooldalon: true
 kep: ../../assets/konyhak/living/living-kombination-08.jpg

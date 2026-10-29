@@ -1,19 +1,11 @@
 ---
+import { url } from '../utils/url';
 import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import heroKep from '../assets/konyhak/amica/amica-eiche-nordic-fjord-grun.jpg';
 import studio from '../data/studio.json';
 
-const modellek = (await getCollection('konyhak')).sort((a, b) => a.data.sorrend - b.data.sorrend).map((k) => k.data.nev);
 const tel = studio.telefon.replace(/\s/g, '');
-
-// Űrlapküldés: ha be van állítva egy űrlapszolgáltatás (pl. Formspree, Netlify Forms),
-// a PUBLIC_FORM_ENDPOINT környezeti változóban add meg a címét. Enélkül az űrlap
-// a látogató levelezőprogramján keresztül küldi el az adatokat az e-mail címre.
-const vegpont = import.meta.env.PUBLIC_FORM_ENDPOINT as string | undefined;
-const action = vegpont || `mailto:${studio.email}?subject=${encodeURIComponent('Időpontfoglalás látványtervezésre')}`;
-const enctype = vegpont ? undefined : 'text/plain';
 
 const lepesek = [
   { cim: 'Időpontfoglalás', szoveg: 'Kiválasztod a neked megfelelő napot.' },
@@ -39,14 +31,15 @@ const lepesek = [
 
   <section class="szekcio" aria-label="Foglalás">
     <div class="tarolo foglalas">
-      <form class="urlap" action={action} method="post" enctype={enctype}>
-        <h2>Időpontkérés</h2>
-        <input type="hidden" name="_next" value="/koszonjuk/" />
+      <form class="urlap" action={studio.foglalasUrlap} method="post" data-koszonjuk={url('/koszonjuk/')}>
+        <h2>Időpontfoglalás</h2>
+        <input type="hidden" name="_subject" value="Időpontfoglalás látványtervezésre" />
+        <input type="text" name="_gotcha" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <label>Név *<input type="text" name="nev" required autocomplete="name" /></label>
         <label>Telefon *<input type="tel" name="telefon" required autocomplete="tel" placeholder="+36 …" /></label>
         <label>E-mail *<input type="email" name="email" required autocomplete="email" /></label>
         <label>Település<input type="text" name="telepules" autocomplete="address-level2" /></label>
-        <label>Preferált nap *<input type="date" name="nap" required /></label>
+        <label>Dátum *<input type="date" name="nap" required /></label>
         <label
           >Napszak
           <select name="napszak">
@@ -55,20 +48,16 @@ const lepesek = [
           </select>
         </label>
         <label class="teljes"
-          >Melyik modell érdekel?
-          <select name="modell" id="modell">
-            <option>Még nem tudom</option>
-            {modellek.map((m) => <option>{m}</option>)}
-          </select>
-        </label>
-        <label class="teljes"
           >Üzenet
           <textarea name="uzenet" rows="5" placeholder="Pl. a konyha mérete, mikorra szeretnéd, különleges kérések…"></textarea>
         </label>
         <label class="teljes jelolo">
           <input type="checkbox" name="adatkezeles" value="elfogadva" required />
-          <span>Elolvastam és elfogadom az <a href="/adatkezeles/">adatkezelési tájékoztatót</a>. *</span>
+          <span>Elolvastam és elfogadom az <a href={url('/adatkezeles/')}>adatkezelési tájékoztatót</a>. *</span>
         </label>
+        <p class="urlap__hiba teljes" role="alert" hidden>
+          Nem sikerült elküldeni a foglalást. Próbáld újra, vagy hívj minket: <a href={`tel:${tel}`}>{studio.telefon}</a>
+        </p>
         <button type="submit" class="gomb gomb--fo teljes">Időpontot kérek</button>
       </form>
 
@@ -108,12 +97,33 @@ const lepesek = [
 </Layout>
 
 <script>
-  // A Konyhák oldalról érkezve (?modell=Silbermond) előre kiválasztja a modellt.
-  const modell = new URLSearchParams(location.search).get('modell');
-  const lista = document.querySelector<HTMLSelectElement>('#modell');
-  if (modell && lista && [...lista.options].some((o) => o.value === modell)) {
-    lista.value = modell;
-  }
+  // Formspree-nek háttérben küld, így sikeres küldés után a saját köszönőoldalunkra irányít
+  // (a Formspree `_next` átirányítása csak fizetős csomagban működik). JS nélkül a sima POST
+  // a Formspree saját visszaigazoló oldalára visz.
+  const urlap = document.querySelector<HTMLFormElement>('form.urlap')!;
+  const hiba = urlap.querySelector<HTMLElement>('.urlap__hiba')!;
+  const gomb = urlap.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+
+  urlap.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hiba.hidden = true;
+    gomb.disabled = true;
+    gomb.textContent = 'Küldés…';
+    try {
+      const valasz = await fetch(urlap.action, {
+        method: 'POST',
+        body: new FormData(urlap),
+        headers: { Accept: 'application/json' },
+      });
+      if (!valasz.ok) throw new Error(`Formspree: ${valasz.status}`);
+      location.href = urlap.dataset.koszonjuk!;
+    } catch (err) {
+      console.error(err);
+      hiba.hidden = false;
+      gomb.disabled = false;
+      gomb.textContent = 'Időpontot kérek';
+    }
+  });
 </script>
 
 <style>
@@ -221,6 +231,14 @@ const lepesek = [
     min-height: 56px;
     padding: 0 36px;
     font-size: 1.0625rem;
+  }
+  .urlap button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+  .urlap__hiba {
+    color: var(--tamarillo);
+    font-weight: 700;
   }
 
   .hozd {

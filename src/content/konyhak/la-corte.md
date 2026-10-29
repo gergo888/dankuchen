@@ -1,7 +1,7 @@
 ---
 nev: La Corte
 alcim: Álom minden színben
-csoport: fogantyus
+csoportok: [fogantyus, kis-meretu]
 sorrend: 7
 fooldalon: true
 kep: ../../assets/konyhak/la-corte/la-corte-kombination-30.jpg

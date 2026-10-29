@@ -1,4 +1,5 @@
 ---
+import { url } from '../utils/url';
 import { Image } from 'astro:assets';
 import logoFeher from '../assets/logok/dankuchen-feher.png';
 import lamelloLogo from '../assets/logok/lamello.png';
@@ -32,19 +33,22 @@ const tel = studio.telefon.replace(/\s/g, '');
       </div>
       <nav aria-label="Lábléc navigáció">
         <h2>Oldalak</h2>
-        <p><a href="/">Főoldal</a></p>
-        <p><a href="/konyhak/">Konyhák</a></p>
-        <p><a href="/kapcsolat/">Kapcsolat</a></p>
-        <p><a href="/idopontfoglalas/">Időpontfoglalás</a></p>
+        <p><a href={url('/')}>Főoldal</a></p>
+        <p><a href={url('/konyhak/')}>Konyhák</a></p>
+        <p><a href={url('/kapcsolat/')}>Kapcsolat</a></p>
+        <p><a href={url('/idopontfoglalas/')}>Időpontfoglalás</a></p>
       </nav>
       <div>
-        <h2>Üzemeltető</h2>
-        <Image src={lamelloLogo} alt="Lamelló" width={96} />
-        <p>{studio.uzemelteto} · 1993 óta Kaposváron</p>
+        
+        <Image src={lamelloLogo} alt="Lamelló" width={128} />
+        
       </div>
     </div>
     <div class="tarolo lablec__jogi">
+      <!--
       <span>© {ev} {studio.uzemelteto} · Cg. {studio.cegjegyzekszam} · Adószám: {studio.adoszam}</span>
+       -->
+      <span>© {ev} {studio.uzemelteto}</span>
     </div>
   </div>
 </footer>
@@ -105,7 +109,7 @@ const tel = studio.telefon.replace(/\s/g, '');
     text-decoration: none;
   }
   .lablec__racs img {
-    width: 96px;
+    width: 128px;
   }
   .lablec__jogi {
     border-top: 1px solid #cfc7bc;

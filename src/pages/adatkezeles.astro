@@ -1,15 +1,20 @@
 ---
+import { getEntry, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import studio from '../data/studio.json';
+
+const tajekoztato = await getEntry('szovegek', 'adatkezeles');
+if (!tajekoztato) throw new Error('Hiányzik: src/content/szovegek/adatkezeles.md');
+const { Content } = await render(tajekoztato);
 ---
 
-<Layout title="Adatkezelési tájékoztató" description="A Lamelló Kft. adatkezelési tájékoztatója.">
+<Layout
+  title="Adatkezelési tájékoztató"
+  description="A LAMELLÓ Kft. adatkezelési tájékoztatója a DANKÜCHEN Exkluzív Stúdió Kaposvár weboldalához."
+>
   <section class="szekcio">
     <div class="tarolo jogi">
-      <h1>Adatkezelési tájékoztató</h1>
-      <!-- TODO: a Lamelló Kft. hivatalos adatkezelési tájékoztatójának szövege ide kerül. -->
-      <p class="bevezeto">Az adatkezelési tájékoztató szövege hamarosan elérhető. Kérdés esetén írj nekünk: <a href={`mailto:${studio.email}`}>{studio.email}</a>.</p>
-      <p>Adatkezelő: {studio.uzemelteto}, {studio.cim} · Cg. {studio.cegjegyzekszam} · Adószám: {studio.adoszam}</p>
+      <h1>{tajekoztato.data.cim}</h1>
+      <Content />
     </div>
   </section>
 </Layout>
@@ -18,10 +23,48 @@ import studio from '../data/studio.json';
   .jogi {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
     max-width: 800px;
+    overflow-wrap: anywhere;
   }
   .jogi h1 {
     font-size: clamp(2.25rem, 5vw, 3.5rem);
+    margin-bottom: 8px;
+  }
+  .jogi :global(h2) {
+    font-size: 1.5rem;
+    margin-top: 32px;
+  }
+  .jogi :global(ol),
+  .jogi :global(ul) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 1.5em;
+  }
+  .jogi :global(li > ul),
+  .jogi :global(li > ol) {
+    margin-top: 8px;
+  }
+  .jogi :global(li > p + p) {
+    margin-top: 12px;
+  }
+  .jogi :global(table) {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    overflow-wrap: normal;
+  }
+  .jogi :global(th),
+  .jogi :global(td) {
+    padding: 10px 12px;
+    border: 1px solid var(--vonal);
+    text-align: left;
+    vertical-align: top;
+    min-width: 160px;
+  }
+  .jogi :global(th) {
+    background: var(--panna);
   }
 </style>
