@@ -1,0 +1,450 @@
+---
+import { url } from '../utils/url';
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Ikon from '../components/Ikon.astro';
+import logo from '../assets/logok/dan-first.png';
+
+const csomagok = await Promise.all(
+  (await getCollection('danFirst'))
+    .sort((a, b) => a.data.sorrend - b.data.sorrend)
+    .map(async (c) => ({ c, Content: (await render(c)).Content })),
+);
+
+const katalogus = url('/dan-first/dan-first-katalogus.pdf');
+const kezdoAr = csomagok[0]?.c.data.ar;
+
+// A DAN FIRST katalógus „Miért a DAN FIRST?” oldala alapján
+const elonyok = [
+  {
+    ikon: 'csomag',
+    cim: 'Minden egy csomagban',
+    szoveg: 'A konyhabútor, a Beko márkás háztartási gépek és a kiegészítők egy csomagban, kedvező áron. Nem kell külön gépeket és tartozékokat válogatnod.',
+  },
+  {
+    ikon: 'szallitas',
+    cim: 'Expressz gyártás 3 hét alatt',
+    szoveg: 'A kiválasztott színben, méretben és felszereltséggel mindössze 3 hét alatt elkészül, felár nélkül.',
+  },
+  {
+    ikon: 'szereles',
+    cim: 'Előre összeszerelt bútor',
+    szoveg: 'A szekrények összeszerelve érkeznek, így a konyha gyorsan és stressz nélkül felállítható. Igény esetén a beszerelést is vállaljuk.',
+  },
+  {
+    ikon: 'gep',
+    cim: 'Márkás gépek, teljes felszereltséggel',
+    szoveg: 'Ismeretlen márkák és kompromisszumok nélkül: 16 magas felszereltségű Beko gép közül választhatsz, 2 év garanciával.',
+  },
+  {
+    ikon: 'terv',
+    cim: 'Ingyenes 3D-tervezés',
+    szoveg: 'A csomagot a saját teredre és ízlésedre szabjuk. Foglalj időpontot ingyenes látványtervezésre a kaposvári stúdióba.',
+  },
+  {
+    ikon: 'terkep',
+    cim: 'Ausztriában gyártva',
+    szoveg: 'Minden DAN FIRST konyha Felső-Ausztriában, a DANKÜCHEN saját gyáraiban készül, fenntartható módon és a megszokott minőségben.',
+  },
+] as const;
+
+// Minden DAN FIRST csomagban benne van (a katalógus szerint)
+const kozos = [
+  {
+    cim: 'Konyhabútor',
+    tetelek: [
+      '18 mm vastag, stabil korpusz',
+      'Blum vasalatok – a világ vezető gyártójától',
+      'Fehér fiókoldalak',
+      'UX korpusz: akár 15%-kal több tárolóhely, felár nélkül',
+      'Kettős felfüggesztő sín a felső szekrényeknél, a nagyobb biztonságért',
+      'Előre összeszerelt szekrények',
+      'Dizájn fogantyúk',
+    ],
+  },
+  {
+    cim: 'Gépek és mosogató',
+    tetelek: ['Beko márkás háztartási gépek, 2 év garanciával', 'Fekete gránit mosogatótálca', 'Fekete csaptelep'],
+  },
+  {
+    cim: 'Kiegészítők',
+    tetelek: [
+      '3 részes, szekrény alá építhető LED-világítás matt fekete színben',
+      'Kihúzható hulladékgyűjtő rendszer',
+      'Evőeszköztartó betét',
+      'Szifon',
+    ],
+  },
+];
+
+// A színminták a katalógusból vett, tájékoztató jellegű árnyalatok.
+const frontszinek = [
+  { nev: 'Polárfehér', szin: '#f2edea' },
+  { nev: 'Jázmin', szin: '#f6e7da' },
+  { nev: 'Manhattan szürke', szin: '#b1b1ae' },
+  { nev: 'Arzano', szin: '#6c6668' },
+  { nev: 'Szil', szin: '#cda57a' },
+];
+---
+
+<Layout
+  title="DAN FIRST"
+  description="DAN FIRST: a DANKÜCHEN komplett konyhacsomagja bútorral, Beko gépekkel és kiegészítőkkel, 3 hetes expressz gyártással. Urban Line, Cozy Chic és Family Concept a kaposvári exkluzív stúdióban."
+  aktiv="dan-first"
+>
+  <section class="szekcio--panna">
+    <div class="tarolo fej">
+      <div class="fej__szoveg">
+        <span class="felirat">Komplett konyhacsomag</span>
+        <h1>DAN FIRST</h1>
+        <p class="bevezeto">Bútor, Beko gépek és kiegészítők egy csomagban, egy áron – 3 hetes expressz gyártással.</p>
+        <p>
+          A DAN FIRST a DANKÜCHEN all-inclusive konyhacsomagja. Egyetlen áron megkapod a konyhabútort, a Beko márkás háztartási gépeket és a
+          kiegészítőket, így nem kell külön gépeket és tartozékokat válogatnod, és előre tudod, mennyibe kerül az új konyha. Három, előre
+          összeállított konyhaterv közül választhatsz, amelyet a kaposvári stúdióban a saját teredre és ízlésedre szabunk – a megszokott
+          osztrák minőségből nem engedve.
+        </p>
+        {kezdoAr && <p class="fej__ar">Már <strong>{kezdoAr}</strong>-tól, személyes átvétellel</p>}
+        <div class="gombok">
+          <a href={katalogus} class="gomb gomb--keret" download>Katalógus letöltése (PDF, 1,2 MB)</a>
+          <a href={url('/idopontfoglalas/')} class="gomb gomb--fo">Időpontot foglalok</a>
+        </div>
+      </div>
+      <Image src={logo} alt="DANKÜCHEN FIRST" width={240} class="fej__logo" />
+    </div>
+  </section>
+
+  <section class="szekcio" aria-labelledby="elonyok">
+    <div class="tarolo elonyok">
+      <div class="szekcio__fej">
+        <h2 id="elonyok">Ezért éri meg a DAN FIRST</h2>
+        <p class="bevezeto">Minden benne van, ami egy új konyhához kell, gyorsan elkészül, és nem kell kompromisszumot kötnöd a minőségben.</p>
+      </div>
+      <ul class="elonyok__racs">
+        {
+          elonyok.map((e) => (
+            <li>
+              <Ikon nev={e.ikon} />
+              <h3>{e.cim}</h3>
+              <p>{e.szoveg}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="szekcio szekcio--panna" aria-labelledby="csomagok">
+    <div class="tarolo csomagok">
+      <div class="szekcio__fej">
+        <h2 id="csomagok">Három konyhaterv, egy kedvező csomagban</h2>
+        <p class="bevezeto">Mindhárom változat 5 frontszínben választható, és a méreteidhez igazítjuk.</p>
+      </div>
+      {
+        csomagok.map(({ c, Content }, i) => (
+          <article id={c.id} class:list={['csomag', { 'csomag--fordit': i % 2 === 1 }]}>
+            <div class="csomag__kepek">
+              <Image src={c.data.kep} alt={c.data.kepLeiras} widths={[600, 1000, 1400]} sizes="(max-width: 900px) 100vw, 60vw" class="csomag__fokep" />
+              {c.data.galeria.length > 0 && (
+                <div class="csomag__galeria">
+                  {c.data.galeria.map((g) => (
+                    <Image src={g.kep} alt={g.leiras} widths={[300, 500]} sizes="(max-width: 900px) 33vw, 20vw" />
+                  ))}
+                </div>
+              )}
+            </div>
+            <div class="csomag__szoveg">
+              <span class="felirat">DAN FIRST</span>
+              <h3>{c.data.nev}</h3>
+              <p class="csomag__alcim">{c.data.alcim}</p>
+              <div class="csomag__leiras">
+                <Content />
+              </div>
+              <div class="csomag__listak">
+                <div>
+                  <h4>Konyhabútor</h4>
+                  <ul>
+                    {c.data.butor.map((t) => (
+                      <li>{t}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4>Beko gépek</h4>
+                  <ul>
+                    {c.data.gepek.map((t) => (
+                      <li>{t}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <p class="csomag__ar">
+                <span>Ár személyes átvétellel</span>
+                <strong>{c.data.ar}</strong>
+              </p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="szekcio" aria-labelledby="kozos">
+    <div class="tarolo kozos">
+      <div class="szekcio__fej">
+        <h2 id="kozos">Minden DAN FIRST konyhában benne van</h2>
+      </div>
+      <div class="kozos__racs">
+        {
+          kozos.map((k) => (
+            <div>
+              <h3>{k.cim}</h3>
+              <ul class="pipa">
+                {k.tetelek.map((t) => (
+                  <li>{t}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+      <div class="szinek">
+        <h3>5 választható frontszín</h3>
+        <ul>
+          {
+            frontszinek.map((s) => (
+              <li>
+                <span class="szinek__minta" style={`background: ${s.szin}`} />
+                {s.nev}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .fej {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px 64px;
+    padding-block: 96px 72px;
+  }
+  .fej__szoveg {
+    flex: 1 1 520px;
+    min-width: 0;
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .fej__szoveg > p:not(.bevezeto, .fej__ar) {
+    line-height: 1.65;
+  }
+  .fej__ar {
+    font-size: 1.125rem;
+  }
+  .fej__ar strong {
+    font-size: 1.5rem;
+  }
+  .fej__logo {
+    width: clamp(140px, 30vw, 240px);
+    height: auto;
+  }
+  .gombok {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .szekcio__fej {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 760px;
+  }
+
+  .elonyok {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .elonyok__racs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 40px 32px;
+  }
+  .elonyok__racs li {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .elonyok__racs :global(svg) {
+    color: var(--dark-blueberry);
+  }
+  .elonyok__racs h3 {
+    font-size: 1.375rem;
+  }
+  .elonyok__racs p {
+    color: var(--szoveg);
+    line-height: 1.6;
+  }
+
+  .csomagok {
+    display: flex;
+    flex-direction: column;
+    gap: 96px;
+  }
+  .csomag {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 48px;
+    align-items: center;
+    scroll-margin-top: 24px;
+  }
+  .csomag--fordit {
+    flex-direction: row-reverse;
+  }
+  .csomag__kepek {
+    flex: 1 1 560px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .csomag__fokep {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+  }
+  .csomag__galeria {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .csomag__galeria img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .csomag__szoveg {
+    flex: 1 1 380px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .csomag__szoveg h3 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+  }
+  .csomag__alcim {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .csomag__leiras {
+    color: var(--szoveg);
+    line-height: 1.65;
+  }
+  .csomag__listak {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    width: 100%;
+    font-size: 0.9375rem;
+  }
+  .csomag__listak h4 {
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .csomag__listak ul {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 1.1em;
+    color: var(--szoveg);
+  }
+  .csomag__ar {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 16px;
+    border-top: 1px solid var(--tahini);
+    width: 100%;
+  }
+  .csomag__ar span {
+    font-size: 0.875rem;
+    color: var(--szoveg-halvany);
+  }
+  .csomag__ar strong {
+    font-family: var(--font-cim);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 2rem;
+  }
+  .kozos {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .kozos__racs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 32px;
+  }
+  .kozos h3 {
+    font-size: 1.375rem;
+    margin-bottom: 12px;
+  }
+  .pipa {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pipa li {
+    position: relative;
+    padding-left: 28px;
+    line-height: 1.5;
+  }
+  .pipa li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 0.3em;
+    width: 12px;
+    height: 7px;
+    border-left: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+  }
+  .szinek ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 28px;
+  }
+  .szinek li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .szinek__minta {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--tahini);
+  }
+</style>

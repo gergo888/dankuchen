@@ -19,6 +19,7 @@ npm run preview  # a build megtekintése
 |---|---|
 | `/` | `src/pages/index.astro` – Főoldal |
 | `/konyhak/` | `src/pages/konyhak.astro` – Konyhák (szűrő, galéria, okos részletek) |
+| `/dan-first/` | `src/pages/dan-first.astro` – DAN FIRST konyhacsomagok, letölthető katalógus |
 | `/kapcsolat/` | `src/pages/kapcsolat.astro` – Elérhetőség, térkép, Lamelló bemutatkozás |
 | `/idopontfoglalas/` | `src/pages/idopontfoglalas.astro` – Látványtervezés foglalás |
 | `/koszonjuk/` | sikeres foglalás után |
@@ -31,6 +32,8 @@ A szövegek és képek md fájlokban vannak, kód nélkül szerkeszthetők:
 - `src/content/konyhak/*.md` – konyhamodellek (név, alcím, csoportok, sorrend, főoldali kiemelés, kép, galéria, leírás)
 - `src/content/szolgaltatasok/*.md` – Látványtervezés, Kiszállítás, Helyszíni szerelés
 - `src/content/reszletek/*.md` – okos részletek a Konyhák oldalon
+- `src/content/dan-first/*.md` – DAN FIRST csomagok (Urban Line, Cozy Chic, Family Concept): név, elrendezés, ár, képek, bútor- és géplista. A minden csomagban közös tételek, az előnyök és a frontszínek a `src/pages/dan-first.astro` elején vannak.
+- `public/dan-first/dan-first-katalogus.pdf` – a letölthető DAN FIRST katalógus (új katalógusnál ugyanezzel a névvel kell felülírni)
 - `src/content/szovegek/lamello.md` – Lamelló bemutatkozás
 - `src/data/studio.json` – cím, nyitvatartás, telefon, e-mail, kapcsolattartó, cégadatok
 - `src/assets/` – képek és logók (az Astro build közben webre optimalizálja őket)

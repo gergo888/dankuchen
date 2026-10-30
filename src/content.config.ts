@@ -43,6 +43,27 @@ const reszletek = defineCollection({
     }),
 });
 
+// DAN FIRST konyhacsomagok (Urban Line, Cozy Chic, Family Concept) a DAN FIRST oldalon.
+// A minden csomagban közös tételek a src/pages/dan-first.astro oldalon vannak.
+const danFirst = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/dan-first' }),
+  schema: ({ image }) =>
+    z.object({
+      nev: z.string(),
+      alcim: z.string(),
+      sorrend: z.number(),
+      // Ár személyes átvétellel, a katalógus szerint (pl. "2.399.000 Ft")
+      ar: z.string(),
+      kep: image(),
+      kepLeiras: z.string(),
+      galeria: z
+        .array(z.object({ kep: image(), leiras: z.string() }))
+        .default([]),
+      butor: z.array(z.string()),
+      gepek: z.array(z.string()),
+    }),
+});
+
 // Hosszabb szövegblokkok (pl. Lamelló bemutatkozás)
 const szovegek = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/szovegek' }),
@@ -51,4 +72,4 @@ const szovegek = defineCollection({
   }),
 });
 
-export const collections = { konyhak, szolgaltatasok, reszletek, szovegek };
+export const collections = { konyhak, szolgaltatasok, reszletek, danFirst, szovegek };
