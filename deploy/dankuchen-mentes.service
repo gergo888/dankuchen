@@ -1,0 +1,16 @@
+[Unit]
+Description=DANKUCHEN foglalasok mentese
+
+[Service]
+Type=oneshot
+User=dankuchen
+Group=dankuchen
+EnvironmentFile=/etc/dankuchen/dankuchen.env
+ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning /opt/dankuchen/mentes.mjs
+StateDirectory=dankuchen
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true

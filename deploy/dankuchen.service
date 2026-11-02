@@ -1,0 +1,27 @@
+[Unit]
+Description=DANKUCHEN idopontfoglalo API
+After=network.target
+
+[Service]
+Type=simple
+User=dankuchen
+Group=dankuchen
+WorkingDirectory=/opt/dankuchen
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=4322
+EnvironmentFile=/etc/dankuchen/dankuchen.env
+ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning server/entry.mjs
+Restart=on-failure
+RestartSec=5
+StateDirectory=dankuchen
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+
+[Install]
+WantedBy=multi-user.target
