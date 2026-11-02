@@ -105,7 +105,7 @@ const frontszinek = [
           összeállított konyhaterv közül választhatsz, amelyet a kaposvári stúdióban a saját teredre és ízlésedre szabunk – a megszokott
           osztrák minőségből nem engedve.
         </p>
-        {kezdoAr && <p class="fej__ar">Már <strong>{kezdoAr}</strong>-tól, személyes átvétellel</p>}
+        {kezdoAr && <p class="fej__ar">Már <strong>{kezdoAr}</strong>-tól</p>}
         <div class="gombok">
           <a href={katalogus} class="gomb gomb--keret" download>Katalógus letöltése (PDF, 1,2 MB)</a>
           <a href={url('/idopontfoglalas/')} class="gomb gomb--fo">Időpontot foglalok</a>
@@ -180,7 +180,9 @@ const frontszinek = [
                 </div>
               </div>
               <p class="csomag__ar">
+                <!--
                 <span>Ár személyes átvétellel</span>
+                -->
                 <strong>{c.data.ar}</strong>
               </p>
             </div>
