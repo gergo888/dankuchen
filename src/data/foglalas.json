@@ -1,0 +1,29 @@
+{
+  "hetNapjai": [1, 2, 3, 4, 5],
+  "kezdoOrak": ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"],
+  "hosszPerc": 60,
+  "legkorabbanNapMulva": 1,
+  "legkesobbNapMulva": 56,
+  "maxAktivFoglalas": 2,
+  "pihenonapok": ["2026-12-24"],
+  "zarvaIdoszakok": [],
+  "zartOrak": [],
+  "lemondottFoglalasok": [],
+  "email": {
+    "smtpHost": "mail.fws.hu",
+    "smtpPort": 587,
+    "szerverNev": "fabutorwebaruhaz.hu",
+    "felhasznalo": "szabo.gergely@lamello.hu",
+    "feladoNev": "DANKÜCHEN Exkluzív Stúdió Kaposvár",
+    "felado": "szabo.gergely@lamello.hu",
+    "ertesitesiCimek": ["szabo.gergely@lamello.hu", "szabogergely100@gmail.com"],
+    "targyLatogatonak": "Időpontfoglalás visszaigazolása: {idopont}",
+    "targyStudionak": "Új időpontfoglalás: {idopont} – {nev}"
+  },
+  "mitHozzMagaddal": [
+    "a helyiség alaprajzát vagy méreteit (falak, ablakok, ajtók)",
+    "a víz-, gáz- és villanybekötések helyét, ha tudod",
+    "pár fotót a jelenlegi konyháról",
+    "inspirációs képeket, ha vannak"
+  ]
+}
