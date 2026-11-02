@@ -168,6 +168,7 @@ Az oldalak statikusak maradnak, csak két API-végpont fut Node-on (`src/pages/a
 | Webes foglalás lemondása | `lemondottFoglalasok`, pl. `[12, 15]` |
 | Kik kapnak értesítést a foglalásról (egy vagy több cím) | `email.ertesitesiCimek` |
 | SMTP szerver és felhasználó | `email.smtpHost`, `smtpPort`, `felhasznalo` |
+| A küldő szerver teljes domainneve, ezzel mutatkozik be a levelezőszervernek | `email.szerverNev` |
 | A feladó neve és címe | `email.feladoNev`, `felado` |
 | A levelek tárgya (a `{idopont}` és a `{nev}` helyére a foglalás adatai kerülnek) | `email.targyLatogatonak`, `targyStudionak` |
 | A visszaigazoló levél és az oldal „Mit hozz magaddal?” listája | `mitHozzMagaddal` |
