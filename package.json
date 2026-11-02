@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.ts\"",
     "astro": "astro"
   },
   "repository": {
@@ -17,11 +18,16 @@
   },
   "homepage": "https://github.com/gergo888/dankuchen#readme",
   "dependencies": {
-    "astro": "^7.4.2"
+    "@astrojs/node": "^11.1.9",
+    "astro": "^7.4.2",
+    "nodemailer": "^10.3.1"
   },
   "type": "module",
   "private": true,
   "engines": {
     "node": ">=22.23.4"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^8.0.2"
   }
 }

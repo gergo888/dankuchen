@@ -161,14 +161,14 @@ Adatkezelő a közösségi oldalon privát üzenetben kizárólag akkor kommunik
 
    Az adatfeldolgozónak az adatok kezelését érintően érdemi döntéshozatala nincsen.
 
-   Az adatkezelő az informatikai háttér biztosítására tárhely-szolgáltatót, az időpontfoglaló űrlap továbbítására űrlapszolgáltatót mint adatfeldolgozót vesz igénybe.
+   Az adatkezelő az informatikai háttér biztosítására tárhely-szolgáltatót, az időpontfoglalással kapcsolatos e-mailek küldésére levelezési szolgáltatót mint adatfeldolgozót vesz igénybe.
 
 2. Egyes adatfeldolgozók
 
 | Adatfeldolgozói tevékenység | Név, cím, elérhetőség |
 |---|---|
-| Tárhely-szolgáltatás | Tárhely.Eu Kft. Telefon: +36 1 789 2 789, fax: +36 1 789 3 789, e-mail: support@tarhely.eu, posta: 1538 Budapest, Pf.: 510. |
-| Az időpontfoglaló űrlap adatainak fogadása és e-mailben történő továbbítása az adatkezelőnek | Formspree, Inc. E-mail: team@formspree.io, weboldal: https://formspree.io. Az adatok kezelése az Amerikai Egyesült Államokban történik. |
+| Tárhely-szolgáltatás, az időpontfoglalások tárolása a szerveren | Tárhely.Eu Kft. Telefon: +36 1 789 2 789, fax: +36 1 789 3 789, e-mail: support@tarhely.eu, posta: 1538 Budapest, Pf.: 510. |
+| Az időpontfoglalással kapcsolatos e-mailek (visszaigazolás, értesítés) továbbítása | fws online Zrt. Cím: 9444 Fertőszentmiklós, Petőfi utca 44., e-mail: ugyfelszolgalat@fws.hu. |
 
 3. Adattovábbítás harmadik fél részére
 
@@ -280,4 +280,4 @@ A tájékoztató elkészítése során figyelemmel voltunk az alábbi jogszabál
 - 2003\. évi C. törvény az elektronikus hírközlésről (kifejezetten a 155. §-a);
 - A Nemzeti Adatvédelmi és Információszabadság Hatóság ajánlása az előzetes tájékoztatás adatvédelmi követelményeiről.
 
-Hatályos: 2026. október 29-től.
+Hatályos: 2026. november 2-től.

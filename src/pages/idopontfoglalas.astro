@@ -4,11 +4,12 @@ import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import heroKep from '../assets/konyhak/amica/amica-eiche-nordic-fjord-grun.jpg';
 import studio from '../data/studio.json';
+import foglalas from '../data/foglalas.json';
 
 const tel = studio.telefon.replace(/\s/g, '');
 
 const lepesek = [
-  { cim: 'Időpontfoglalás', szoveg: 'Kiválasztod a neked megfelelő napot.' },
+  { cim: 'Időpontfoglalás', szoveg: 'Kiválasztod a neked megfelelő napot és órát.' },
   { cim: 'Tervezés', szoveg: 'A bemutatóteremben megtervezzük és 3D-ben megmutatjuk a konyhát.' },
   { cim: 'Felmérés és ajánlat', szoveg: 'Kimegyünk felmérni, és részletes, átlátható ajánlatot adunk.' },
   { cim: 'Gyártás, kiszállítás, szerelés', szoveg: 'Ausztriában legyártjuk, házhoz szállítjuk és beszereljük.' },
@@ -31,20 +32,26 @@ const lepesek = [
 
   <section class="szekcio" aria-label="Foglalás">
     <div class="tarolo foglalas">
-      <form class="urlap" action={studio.foglalasUrlap} method="post" data-koszonjuk={url('/koszonjuk/')}>
+      <form class="urlap" data-szabad={url('/api/szabad-idopontok')} data-foglalas={url('/api/foglalas')} data-koszonjuk={url('/koszonjuk/')}>
         <h2>Időpontfoglalás</h2>
-        <input type="hidden" name="_subject" value="Időpontfoglalás látványtervezésre" />
+        <noscript class="teljes">
+          <p class="urlap__hiba">Az online foglaláshoz JavaScript szükséges. Hívj minket: <a href={`tel:${tel}`}>{studio.telefon}</a></p>
+        </noscript>
         <input type="text" name="_gotcha" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <label>Név *<input type="text" name="nev" required autocomplete="name" /></label>
         <label>Telefon *<input type="tel" name="telefon" required autocomplete="tel" placeholder="+36 …" /></label>
         <label>E-mail *<input type="email" name="email" required autocomplete="email" /></label>
         <label>Település<input type="text" name="telepules" autocomplete="address-level2" /></label>
-        <label>Dátum *<input type="date" name="nap" required /></label>
         <label
-          >Napszak
-          <select name="napszak">
-            <option>Délelőtt (8–12)</option>
-            <option>Délután (12–16)</option>
+          >Dátum *
+          <select name="nap" required disabled>
+            <option value="">Betöltés…</option>
+          </select>
+        </label>
+        <label
+          >Óra *
+          <select name="ora" required disabled>
+            <option value="">Előbb válassz napot</option>
           </select>
         </label>
         <label class="teljes"
@@ -56,18 +63,15 @@ const lepesek = [
           <span>Elolvastam és elfogadom az <a href={url('/adatkezeles/')}>adatkezelési tájékoztatót</a>. *</span>
         </label>
         <p class="urlap__hiba teljes" role="alert" hidden>
-          Nem sikerült elküldeni a foglalást. Próbáld újra, vagy hívj minket: <a href={`tel:${tel}`}>{studio.telefon}</a>
+          <span></span> Telefonon is segítünk: <a href={`tel:${tel}`}>{studio.telefon}</a>
         </p>
-        <button type="submit" class="gomb gomb--fo teljes">Időpontot kérek</button>
+        <button type="submit" class="gomb gomb--fo teljes" disabled>Időpontot foglalok</button>
       </form>
 
       <aside class="hozd">
         <h2>Mit hozz magaddal?</h2>
         <ul>
-          <li>a helyiség alaprajzát vagy méreteit (falak, ablakok, ajtók)</li>
-          <li>a víz-, gáz- és villanybekötések helyét, ha tudod</li>
-          <li>pár fotót a jelenlegi konyháról</li>
-          <li>inspirációs képeket, ha vannak</li>
+          {foglalas.mitHozzMagaddal.map((t) => <li>{t}</li>)}
         </ul>
         <div class="hozd__tel">
           <strong>Inkább telefonálnál?</strong>
@@ -97,12 +101,62 @@ const lepesek = [
 </Layout>
 
 <script>
-  // Formspree-nek háttérben küld, így sikeres küldés után a saját köszönőoldalunkra irányít
-  // (a Formspree `_next` átirányítása csak fizetős csomagban működik). JS nélkül a sima POST
-  // a Formspree saját visszaigazoló oldalára visz.
+  import { alapertelmezettNap, napFelirat, oraFelirat } from '../lib/foglalas/idopontok.ts';
+
   const urlap = document.querySelector<HTMLFormElement>('form.urlap')!;
+  const napMezo = urlap.querySelector<HTMLSelectElement>('select[name="nap"]')!;
+  const oraMezo = urlap.querySelector<HTMLSelectElement>('select[name="ora"]')!;
   const hiba = urlap.querySelector<HTMLElement>('.urlap__hiba')!;
   const gomb = urlap.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+  const GOMB_FELIRAT = gomb.textContent!;
+
+  const UZENETEK: Record<string, string> = {
+    foglalt: 'Ezt az órát közben lefoglalták, válassz másikat.',
+    idopont: 'Ez az időpont már nem foglalható, válassz másikat.',
+    'tul-sok-foglalas': 'Ezzel az e-mail címmel vagy telefonszámmal már több élő foglalásod van.',
+    'tul-sok-keres': 'Túl sok próbálkozás. Kérjük, próbáld újra néhány perc múlva.',
+    adat: 'Kérjük, ellenőrizd a megadott adatokat.',
+  };
+
+  let napok: Record<string, string[]> = {};
+  let hosszPerc = 60;
+
+  function hibaMutatasa(szoveg: string) {
+    hiba.querySelector('span')!.textContent = szoveg;
+    hiba.hidden = false;
+  }
+
+  function orakFrissitese() {
+    const orak = napok[napMezo.value] ?? [];
+    const korabbi = oraMezo.value;
+    oraMezo.replaceChildren(
+      new Option(napMezo.value ? 'Válassz órát' : 'Előbb válassz napot', ''),
+      ...orak.map((o) => new Option(oraFelirat(o, hosszPerc), o)),
+    );
+    oraMezo.disabled = orak.length === 0;
+    if (orak.includes(korabbi)) oraMezo.value = korabbi;
+  }
+
+  async function szabadIdopontokBetoltese() {
+    const korabbi = napMezo.value;
+    try {
+      const valasz = await fetch(urlap.dataset.szabad!, { headers: { Accept: 'application/json' } });
+      if (!valasz.ok) throw new Error(`Szabad időpontok: ${valasz.status}`);
+      ({ napok, hosszPerc } = await valasz.json());
+    } catch (err) {
+      console.error(err);
+      napok = {};
+      hibaMutatasa('Most nem tudjuk betölteni a szabad időpontokat.');
+    }
+    const lista = Object.keys(napok);
+    napMezo.replaceChildren(...(lista.length ? lista.map((n) => new Option(napFelirat(n), n)) : [new Option('Nincs szabad időpont', '')]));
+    napMezo.disabled = lista.length === 0;
+    gomb.disabled = lista.length === 0;
+    if (lista.length > 0) napMezo.value = lista.includes(korabbi) ? korabbi : alapertelmezettNap(lista, new Date());
+    orakFrissitese();
+  }
+
+  napMezo.addEventListener('change', orakFrissitese);
 
   urlap.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -110,20 +164,34 @@ const lepesek = [
     gomb.disabled = true;
     gomb.textContent = 'Küldés…';
     try {
-      const valasz = await fetch(urlap.action, {
+      const valasz = await fetch(urlap.dataset.foglalas!, {
         method: 'POST',
-        body: new FormData(urlap),
-        headers: { Accept: 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(urlap))),
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       });
-      if (!valasz.ok) throw new Error(`Formspree: ${valasz.status}`);
-      location.href = urlap.dataset.koszonjuk!;
+      if (valasz.ok) {
+        location.href = urlap.dataset.koszonjuk!;
+        return;
+      }
+      const { hiba: kod } = await valasz.json().catch(() => ({ hiba: '' }));
+      hibaMutatasa(UZENETEK[kod] ?? 'Nem sikerült elküldeni a foglalást. Próbáld újra.');
+      if (kod === 'foglalt' || kod === 'idopont') await szabadIdopontokBetoltese();
     } catch (err) {
       console.error(err);
-      hiba.hidden = false;
-      gomb.disabled = false;
-      gomb.textContent = 'Időpontot kérek';
+      hibaMutatasa('Nem sikerült elküldeni a foglalást. Próbáld újra.');
     }
+    gomb.disabled = false;
+    gomb.textContent = GOMB_FELIRAT;
   });
+
+  // A vissza gombbal gyorsítótárból visszatérve is friss lista kell, és a gomb se maradjon „Küldés…”.
+  addEventListener('pageshow', (e) => {
+    if (!e.persisted) return;
+    gomb.textContent = GOMB_FELIRAT;
+    szabadIdopontokBetoltese();
+  });
+
+  szabadIdopontokBetoltese();
 </script>
 
 <style>
@@ -232,9 +300,9 @@ const lepesek = [
     padding: 0 36px;
     font-size: 1.0625rem;
   }
-  .urlap button:disabled {
+  .urlap button:disabled,
+  .urlap select:disabled {
     opacity: 0.6;
-    cursor: wait;
   }
   .urlap__hiba {
     color: var(--tamarillo);

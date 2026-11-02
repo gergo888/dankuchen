@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import node from '@astrojs/node';
 
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
@@ -7,4 +8,6 @@ export default defineConfig({
   // site: 'https://example.hu',
   // Alkönyvtárba telepítéshez: BASE_PATH=/dankuchen npm run build
   base: process.env.BASE_PATH || '/',
+  // Az oldalak statikusak maradnak, csak az időpontfoglaló API fut szerveren.
+  adapter: node({ mode: 'standalone' }),
 });
