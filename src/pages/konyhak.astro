@@ -3,6 +3,7 @@ import { url } from '../utils/url';
 import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import Galeria from '../components/Galeria.astro';
 
 const konyhak = (await getCollection('konyhak')).sort((a, b) => a.data.sorrend - b.data.sorrend);
 const reszletek = (await getCollection('reszletek')).sort((a, b) => a.data.sorrend - b.data.sorrend);
@@ -48,14 +49,7 @@ const modellek = await Promise.all(konyhak.map(async (k) => ({ k, Content: (awai
         modellek.map(({ k, Content }, i) => (
           <article id={k.id} class:list={['modell', { 'modell--fordit': i % 2 === 1 }]} data-csoportok={k.data.csoportok.join(' ')}>
             <div class="modell__kepek">
-              <Image src={k.data.kep} alt={k.data.kepLeiras} widths={[600, 1000, 1400]} sizes="(max-width: 900px) 100vw, 60vw" class="modell__fokep" />
-              {k.data.galeria.length > 0 && (
-                <div class="modell__galeria">
-                  {k.data.galeria.map((g) => (
-                    <Image src={g.kep} alt={g.leiras} widths={[300, 500]} sizes="(max-width: 900px) 33vw, 20vw" />
-                  ))}
-                </div>
-              )}
+              <Galeria kep={k.data.kep} kepLeiras={k.data.kepLeiras} galeria={k.data.galeria} />
             </div>
             <div class="modell__szoveg">
               <span class="felirat">{k.data.csoportok.map((c) => csoportNev[c]).join(' · ')}</span>
@@ -180,24 +174,6 @@ const modellek = await Promise.all(konyhak.map(async (k) => ({ k, Content: (awai
   .modell__kepek {
     flex: 1 1 560px;
     min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .modell__fokep {
-    width: 100%;
-    aspect-ratio: 3 / 2;
-    object-fit: cover;
-  }
-  .modell__galeria {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-  }
-  .modell__galeria img {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
   }
   .modell__szoveg {
     flex: 1 1 360px;

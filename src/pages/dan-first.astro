@@ -4,6 +4,7 @@ import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Ikon from '../components/Ikon.astro';
+import Galeria from '../components/Galeria.astro';
 import logo from '../assets/logok/dan-first.png';
 
 const csomagok = await Promise.all(
@@ -145,14 +146,7 @@ const frontszinek = [
         csomagok.map(({ c, Content }, i) => (
           <article id={c.id} class:list={['csomag', { 'csomag--fordit': i % 2 === 1 }]}>
             <div class="csomag__kepek">
-              <Image src={c.data.kep} alt={c.data.kepLeiras} widths={[600, 1000, 1400]} sizes="(max-width: 900px) 100vw, 60vw" class="csomag__fokep" />
-              {c.data.galeria.length > 0 && (
-                <div class="csomag__galeria">
-                  {c.data.galeria.map((g) => (
-                    <Image src={g.kep} alt={g.leiras} widths={[300, 500]} sizes="(max-width: 900px) 33vw, 20vw" />
-                  ))}
-                </div>
-              )}
+              <Galeria kep={c.data.kep} kepLeiras={c.data.kepLeiras} galeria={c.data.galeria} />
             </div>
             <div class="csomag__szoveg">
               <span class="felirat">DAN FIRST</span>
@@ -319,24 +313,6 @@ const frontszinek = [
   .csomag__kepek {
     flex: 1 1 560px;
     min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .csomag__fokep {
-    width: 100%;
-    aspect-ratio: 3 / 2;
-    object-fit: cover;
-  }
-  .csomag__galeria {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-  }
-  .csomag__galeria img {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
   }
   .csomag__szoveg {
     flex: 1 1 380px;

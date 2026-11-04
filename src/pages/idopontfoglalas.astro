@@ -208,6 +208,14 @@ const lepesek = [
     height: 100%;
     object-fit: cover;
   }
+  /* A kép teteje minden szélességen ugyanott vágódik: a falképen lévő alak homlokánál, a kép magasságának 32%-ánál.
+     A kép 4:3-as, a magassága 75vw, ennek a 32%-a a 24vw. Más képnél ezt újra be kell állítani.
+     Keskenyebb ablakban a vágás alatt nem maradna elég kép a hero kitöltéséhez, ezért ott középre igazított marad. */
+  @media (min-width: 1100px) {
+    .hero__kep {
+      object-position: 50% -24vw;
+    }
+  }
   .hero::after {
     content: '';
     position: absolute;

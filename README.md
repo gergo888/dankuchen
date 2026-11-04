@@ -19,7 +19,7 @@ npm test         # a foglalási szabályok és a foglalas.json ellenőrzése
 | Útvonal | Fájl |
 |---|---|
 | `/` | `src/pages/index.astro` – Főoldal |
-| `/konyhak/` | `src/pages/konyhak.astro` – Konyhák (szűrő, galéria, okos részletek) |
+| `/konyhak/` | `src/pages/konyhak.astro` – Konyhák (szűrő, galéria, okos részletek). A galéria közös a DAN FIRST oldallal: `src/components/Galeria.astro` (lapozás a kis képekkel, nagyítás a főképre kattintva) |
 | `/dan-first/` | `src/pages/dan-first.astro` – DAN FIRST konyhacsomagok, letölthető katalógus |
 | `/kapcsolat/` | `src/pages/kapcsolat.astro` – Elérhetőség, térkép, Lamelló bemutatkozás |
 | `/idopontfoglalas/` | `src/pages/idopontfoglalas.astro` – Látványtervezés foglalás |
@@ -59,7 +59,7 @@ A `/dankuchen` előtag a teszt szerver miatt van, és a build `BASE_PATH` érté
 │   └── fonts/                márkafontok
 ├── src/
 │   ├── assets/               képek és logók, a build webre optimalizálja őket
-│   ├── components/           Header, Footer, Ikon, Jelveny, Szolgaltatasok
+│   ├── components/           Header, Footer, Galeria, Ikon, Jelveny, Szolgaltatasok
 │   ├── content/              md tartalom: konyhak, reszletek, szolgaltatasok, dan-first, szovegek
 │   ├── content.config.ts     a tartalomgyűjtemények sémái
 │   ├── data/
