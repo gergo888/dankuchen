@@ -19,11 +19,5 @@
     "ertesitesiCimek": ["szabo.gergely@lamello.hu", "szabogergely100@gmail.com"],
     "targyLatogatonak": "Időpontfoglalás visszaigazolása: {idopont}",
     "targyStudionak": "Új időpontfoglalás: {idopont} – {nev}"
-  },
-  "mitHozzMagaddal": [
-    "a helyiség alaprajzát vagy méreteit (falak, ablakok, ajtók)",
-    "a víz-, gáz- és villanybekötések helyét, ha tudod",
-    "pár fotót a jelenlegi konyháról",
-    "inspirációs képeket, ha vannak"
-  ]
+  }
 }

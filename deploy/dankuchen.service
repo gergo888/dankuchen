@@ -6,12 +6,12 @@ After=network.target
 Type=simple
 User=dankuchen
 Group=dankuchen
-WorkingDirectory=/opt/dankuchen
+WorkingDirectory=/opt/dankuchen/backend
 Environment=NODE_ENV=production
 Environment=HOST=127.0.0.1
 Environment=PORT=4322
 EnvironmentFile=/etc/dankuchen/dankuchen.env
-ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning server/entry.mjs
+ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning src/server.ts
 Restart=on-failure
 RestartSec=5
 StateDirectory=dankuchen

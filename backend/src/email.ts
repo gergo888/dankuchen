@@ -1,8 +1,8 @@
 import nodemailer from 'nodemailer';
-import studio from '../../data/studio.json' with { type: 'json' };
+import studio from '../../shared/studio.json' with { type: 'json' };
 import type { Beallitasok } from './beallitasok.ts';
 import type { FoglalasAdatok } from './db.ts';
-import { napFelirat, oraFelirat, utcIdopont } from './idopontok.ts';
+import { napFelirat, oraFelirat, utcIdopont } from '../../shared/idopontok.ts';
 
 export interface Foglalas extends FoglalasAdatok {
   id: number;
@@ -74,7 +74,7 @@ export function levelek(f: Foglalas, sz: Beallitasok, most: Date) {
     `Térkép: ${studio.terkepLink}`,
     '',
     'Mit hozz magaddal?',
-    ...sz.mitHozzMagaddal.map((t) => `- ${t}`),
+    ...studio.mitHozzMagaddal.map((t) => `- ${t}`),
     '',
     `Ha mégsem tudsz jönni, kérjük, jelezd a ${studio.telefon} telefonszámon.`,
     '',

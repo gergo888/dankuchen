@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { beallitasok, ellenoriz } from '../src/lib/foglalas/beallitasok.ts';
-import { aktivFoglalasok, foglal, foglaltOrak, lemondasok, megnyitas, regiekTorlese } from '../src/lib/foglalas/db.ts';
-import { levelek, naptarFajl } from '../src/lib/foglalas/email.ts';
+import { beallitasok, ellenoriz } from '../src/beallitasok.ts';
+import { aktivFoglalasok, foglal, foglaltOrak, lemondasok, megnyitas, regiekTorlese } from '../src/db.ts';
+import { levelek, naptarFajl } from '../src/email.ts';
 import {
   alapertelmezettNap,
   ervenyesIdopont,
@@ -14,8 +14,8 @@ import {
   unnepnapok,
   utcIdopont,
   type IdopontSzabalyok,
-} from '../src/lib/foglalas/idopontok.ts';
-import { urlapEllenorzes } from '../src/lib/foglalas/urlap.ts';
+} from '../../shared/idopontok.ts';
+import { urlapEllenorzes } from '../src/urlap.ts';
 
 const SZABALYOK: IdopontSzabalyok = {
   hetNapjai: [1, 2, 3, 4, 5],

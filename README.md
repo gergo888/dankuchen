@@ -4,90 +4,99 @@ A Lamelló Kft. kaposvári DANKÜCHEN bemutatótermének weboldala, [Astro](http
 
 ## Indítás
 
-Node.js 22.23.4 vagy újabb kell (`.nvmrc`: 24).
+Node.js 22.23.4 vagy újabb kell (`.nvmrc`: 24). A parancsok a repó gyökeréből futnak.
 
 ```sh
-npm install
-npm run dev      # fejlesztői szerver: http://localhost:4321
-npm run build    # statikus oldal a dist/client/, API a dist/server/ mappába
-npm run preview  # a build megtekintése
-npm test         # a foglalási szabályok és a foglalas.json ellenőrzése
+npm run setup    # függőségek telepítése mindkét alkalmazásban
+npm run dev      # backend (4322-es port) és frontend (http://localhost:4321) együtt, a Ctrl+C mindkettőt leállítja
+npm run build    # a frontend buildje a frontend/dist/ mappába
+npm test         # a backend tesztjei: foglalási szabályok, API, foglalas.json
 ```
 
 ## Oldalak
 
 | Útvonal | Fájl |
 |---|---|
-| `/` | `src/pages/index.astro` – Főoldal |
-| `/konyhak/` | `src/pages/konyhak.astro` – Konyhák (szűrő, galéria, okos részletek). A galéria közös a DAN FIRST oldallal: `src/components/Galeria.astro` (lapozás a kis képekkel, nagyítás a főképre kattintva) |
-| `/dan-first/` | `src/pages/dan-first.astro` – DAN FIRST konyhacsomagok, letölthető katalógus |
-| `/kapcsolat/` | `src/pages/kapcsolat.astro` – Elérhetőség, térkép, Lamelló bemutatkozás |
-| `/idopontfoglalas/` | `src/pages/idopontfoglalas.astro` – Látványtervezés foglalás |
+| `/` | `frontend/src/pages/index.astro` – Főoldal |
+| `/konyhak/` | `frontend/src/pages/konyhak.astro` – Konyhák (szűrő, galéria, okos részletek). A galéria közös a DAN FIRST oldallal: `frontend/src/components/Galeria.astro` (lapozás a kis képekkel, nagyítás a főképre kattintva) |
+| `/dan-first/` | `frontend/src/pages/dan-first.astro` – DAN FIRST konyhacsomagok, letölthető katalógus |
+| `/kapcsolat/` | `frontend/src/pages/kapcsolat.astro` – Elérhetőség, térkép, Lamelló bemutatkozás |
+| `/idopontfoglalas/` | `frontend/src/pages/idopontfoglalas.astro` – Látványtervezés foglalás |
 | `/koszonjuk/` | sikeres foglalás után |
-| `/adatkezeles/` | adatkezelési tájékoztató (`src/content/szovegek/adatkezeles.md`) |
-| `/api/szabad-idopontok` | `src/pages/api/szabad-idopontok.ts` – szabad órák (Node) |
-| `/api/foglalas` | `src/pages/api/foglalas.ts` – foglalás beküldése (Node) |
+| `/adatkezeles/` | adatkezelési tájékoztató (`frontend/src/content/szovegek/adatkezeles.md`) |
+| `/api/szabad-idopontok` | `backend/src/api.ts` – szabad órák |
+| `/api/foglalas` | `backend/src/api.ts` – foglalás beküldése |
 
 ## Felépítés
 
-Az oldal két részből áll. A látogató által látott oldalak statikus fájlok, ezeket a build állítja elő, és az Apache szolgálja ki. Csak az időpontfoglalás fut szerveren: egy kis Node-folyamat, amelyet az Apache a `/api` útvonalon ér el, és amely kívülről közvetlenül nem elérhető.
+A projekt két külön alkalmazásból áll, saját `package.json`-nal:
+
+- **`frontend/`:** tisztán statikus Astro-oldal. A build HTML-, CSS-, JS- és képfájlokat állít elő, ezeket az Apache szolgálja ki.
+- **`backend/`:** a foglalási API, egy kis Node-szerver külső keretrendszer nélkül. Az Apache a `/api` útvonalon éri el, kívülről közvetlenül nem elérhető. Nincs buildje, a Node közvetlenül futtatja a TypeScript-fájlokat.
+
+Ami mindkettőnek kell, a `shared/` mappában van.
 
 ```
 Böngésző
    │
    ▼
 Apache (443-as port)
-   ├─ /dankuchen/...      → /var/www/dankuchen      statikus oldalak
-   └─ /dankuchen/api/...  → Node, 127.0.0.1:4322    szabad órák, foglalás
+   ├─ /dankuchen/...      → /var/www/dankuchen      statikus oldalak (frontend)
+   └─ /dankuchen/api/...  → Node, 127.0.0.1:4322    szabad órák, foglalás (backend)
                                ├─ SQLite fájl       /var/lib/dankuchen/foglalasok.db
                                └─ SMTP              mail.fws.hu:587 (e-mailek)
 ```
 
-A `/dankuchen` előtag a teszt szerver miatt van, és a build `BASE_PATH` értékéből jön. Saját domainen a build `BASE_PATH` nélkül készül, az előtag ekkor eltűnik. A belső linkek ezért mindig a `url()` segédfüggvénnyel (`src/utils/url.ts`) készülnek.
+A `/dankuchen` előtag a teszt szerver miatt van, és a frontend build `BASE_PATH` értékéből jön. Saját domainen a build `BASE_PATH` nélkül készül, az előtag ekkor eltűnik. A frontend belső linkjei ezért mindig a `url()` segédfüggvénnyel (`frontend/src/utils/url.ts`) készülnek. A backend az útvonal végét nézi, így mindkét esetben működik. Fejlesztéskor az Astro dev szervere továbbítja az `/api` kéréseket a backendnek (`frontend/astro.config.mjs`).
 
 ### Könyvtárak
 
 ```
 .
-├── astro.config.mjs          Astro beállítások: base útvonal, Node adapter
-├── package.json              függőségek, npm parancsok
-├── .nvmrc                    Node verzió
-├── .env.example              minta a szerveren lévő env fájlhoz
-├── data/                     helyi fejlesztői adatbázis (nincs a gitben)
-├── public/                   változtatás nélkül kerül az oldalra
-│   ├── dan-first/            letölthető DAN FIRST katalógus
-│   └── fonts/                márkafontok
-├── src/
-│   ├── assets/               képek és logók, a build webre optimalizálja őket
-│   ├── components/           Header, Footer, Galeria, Ikon, Jelveny, Szolgaltatasok
-│   ├── content/              md tartalom: konyhak, reszletek, szolgaltatasok, dan-first, szovegek
-│   ├── content.config.ts     a tartalomgyűjtemények sémái
-│   ├── data/
-│   │   ├── studio.json       cím, nyitvatartás, telefon, cégadatok
-│   │   └── foglalas.json     az időpontfoglalás minden beállítása
-│   ├── layouts/Layout.astro  közös oldalváz: head, fontok, fejléc, lábléc
-│   ├── lib/foglalas/         az időpontfoglalás kódja (lásd lent)
-│   ├── pages/                minden fájl egy útvonal
-│   │   └── api/              a két Node-on futó végpont
-│   ├── styles/global.css     színek, fontok, közös osztályok
-│   └── utils/url.ts          belső linkek a base útvonallal
-├── test/foglalas.test.ts     a foglalási szabályok tesztjei
-└── deploy/                   telepítés és üzemeltetés (lásd lent)
+├── package.json                   közös parancsok (setup, dev, build, test), függőség nélkül
+├── dev.mjs                        a két alkalmazás együttes indítása fejlesztéshez
+├── .nvmrc                         Node verzió
+├── frontend/                      statikus Astro-oldal
+│   ├── package.json               astro
+│   ├── astro.config.mjs           base útvonal, fejlesztői proxy az API-hoz
+│   ├── public/                    változtatás nélkül kerül az oldalra
+│   │   ├── dan-first/             letölthető DAN FIRST katalógus
+│   │   └── fonts/                 márkafontok
+│   └── src/
+│       ├── assets/                képek és logók, a build webre optimalizálja őket
+│       ├── components/            Header, Footer, Galeria, Ikon, Jelveny, Szolgaltatasok
+│       ├── content/               md tartalom: konyhak, reszletek, szolgaltatasok, dan-first, szovegek
+│       ├── content.config.ts      a tartalomgyűjtemények sémái
+│       ├── layouts/Layout.astro   közös oldalváz: head, fontok, fejléc, lábléc
+│       ├── pages/                 minden fájl egy útvonal
+│       ├── styles/global.css      színek, fontok, közös osztályok
+│       └── utils/url.ts           belső linkek a base útvonallal
+├── backend/                       foglalási API
+│   ├── package.json               nodemailer, zod
+│   ├── foglalas.json              az időpontfoglalás minden beállítása
+│   ├── .env.example               minta a szerveren lévő env fájlhoz
+│   ├── data/                      helyi fejlesztői adatbázis (nincs a gitben)
+│   ├── src/                       a szerver kódja (lásd lent)
+│   └── test/                      tesztek
+├── shared/                        amit mindkét alkalmazás használ
+│   ├── studio.json                cím, nyitvatartás, telefon, cégadatok, „Mit hozz magaddal?” lista
+│   └── idopontok.ts               foglalási szabályok és dátumfeliratok
+└── deploy/                        telepítés és üzemeltetés (lásd lent)
 ```
 
 ### Az időpontfoglalás kódja
 
 | Fájl | Mit csinál |
 |---|---|
-| `src/pages/idopontfoglalas.astro` | Az űrlap és a böngészőben futó script: betölti a szabad órákat, beküldi a foglalást, megjeleníti a hibákat |
-| `src/pages/api/szabad-idopontok.ts` | GET: a szabad órák napokra bontva, személyes adat nélkül |
-| `src/pages/api/foglalas.ts` | POST: a foglalás ellenőrzése és mentése, a levélküldés elindítása |
-| `src/lib/foglalas/idopontok.ts` | Szabályok: ünnepek, foglalható napok és órák, dátumfeliratok. A böngésző is használja a feliratokhoz, ezért nincs benne Node-függőség és beállítás-import |
-| `src/lib/foglalas/beallitasok.ts` | Beolvassa és ellenőrzi a `foglalas.json` fájlt |
-| `src/lib/foglalas/db.ts` | SQLite: tábla létrehozása, foglalás, foglalt órák, lemondás, 2 évnél régebbi sorok törlése |
-| `src/lib/foglalas/szerver.ts` | Megnyitja az adatbázist, érvényesíti a lemondásokat, IP-korlát, JSON-válasz |
-| `src/lib/foglalas/urlap.ts` | A beküldött mezők ellenőrzése |
-| `src/lib/foglalas/email.ts` | A két levél szövege, a naptármelléklet, a küldés. A feladó neve és a tárgyak a `foglalas.json` fájlból jönnek |
+| `frontend/src/pages/idopontfoglalas.astro` | Az űrlap és a böngészőben futó script: betölti a szabad órákat, beküldi a foglalást, megjeleníti a hibákat |
+| `backend/src/server.ts` | HTTP-szerver: útválasztás, kérés beolvasása, JSON-válasz |
+| `backend/src/api.ts` | A két végpont: a szabad órák lekérése, a foglalás ellenőrzése és mentése, a levélküldés elindítása. Itt nyílik meg az adatbázis |
+| `backend/src/beallitasok.ts` | Beolvassa és ellenőrzi a `foglalas.json` fájlt |
+| `backend/src/db.ts` | SQLite: tábla létrehozása, foglalás, foglalt órák, lemondás, 2 évnél régebbi sorok törlése |
+| `backend/src/korlat.ts` | IP-nkénti korlát |
+| `backend/src/urlap.ts` | A beküldött mezők ellenőrzése |
+| `backend/src/email.ts` | A két levél szövege, a naptármelléklet, a küldés. A feladó neve és a tárgyak a `foglalas.json` fájlból jönnek |
+| `shared/idopontok.ts` | Szabályok: ünnepek, foglalható napok és órák, dátumfeliratok. A böngésző is használja a feliratokhoz, ezért nincs benne Node-függőség és beállítás-import |
 
 Egy foglalás útja:
 
@@ -100,8 +109,11 @@ Egy foglalás útja:
 |---|---|
 | `201` | Sikeres foglalás |
 | `400` | Hibás adat (`adat`) vagy nem foglalható időpont (`idopont`) |
+| `404`, `405` | Ismeretlen útvonal (`nincs-ilyen`), rossz metódus (`metodus`) |
 | `409` | Az órát közben lefoglalták (`foglalt`) |
+| `413` | A kérés 16 KB-nál nagyobb (`tul-nagy`) |
 | `429` | Túl sok kérés erről az IP-ről (`tul-sok-keres`), vagy túl sok élő foglalás (`tul-sok-foglalas`) |
+| `500` | Váratlan hiba (`szerver`), a részletek a naplóba kerülnek |
 
 Az adatbázis a szolgáltatás indulása utáni első kérésnél nyílik meg. Ekkor érvényesülnek a `lemondottFoglalasok` azonosítói, és törlődnek a 2 évnél régebbi sorok. A `deploy/telepit.sh` ellenőrző hívása miatt ez telepítéskor azonnal megtörténik.
 
@@ -109,31 +121,31 @@ Az adatbázis a szolgáltatás indulása utáni első kérésnél nyílik meg. E
 
 A szövegek és képek md fájlokban vannak, kód nélkül szerkeszthetők:
 
-- `src/content/konyhak/*.md` – konyhamodellek (név, alcím, csoportok, sorrend, főoldali kiemelés, kép, galéria, leírás)
-- `src/content/szolgaltatasok/*.md` – Látványtervezés, Kiszállítás, Helyszíni szerelés
-- `src/content/reszletek/*.md` – okos részletek a Konyhák oldalon
-- `src/content/dan-first/*.md` – DAN FIRST csomagok (Urban Line, Cozy Chic, Family Concept): név, elrendezés, ár, képek, bútor- és géplista. A minden csomagban közös tételek, az előnyök és a frontszínek a `src/pages/dan-first.astro` elején vannak.
-- `public/dan-first/dan-first-katalogus.pdf` – a letölthető DAN FIRST katalógus (új katalógusnál ugyanezzel a névvel kell felülírni)
-- `src/content/szovegek/lamello.md` – Lamelló bemutatkozás
-- `src/data/studio.json` – cím, nyitvatartás, telefon, e-mail, kapcsolattartó, cégadatok
-- `src/data/foglalas.json` – az időpontfoglalás minden beállítása (lásd lent)
-- `src/assets/` – képek és logók (az Astro build közben webre optimalizálja őket)
+- `frontend/src/content/konyhak/*.md` – konyhamodellek (név, alcím, csoportok, sorrend, főoldali kiemelés, kép, galéria, leírás)
+- `frontend/src/content/szolgaltatasok/*.md` – Látványtervezés, Kiszállítás, Helyszíni szerelés
+- `frontend/src/content/reszletek/*.md` – okos részletek a Konyhák oldalon
+- `frontend/src/content/dan-first/*.md` – DAN FIRST csomagok (Urban Line, Cozy Chic, Family Concept): név, elrendezés, ár, képek, bútor- és géplista. A minden csomagban közös tételek, az előnyök és a frontszínek a `frontend/src/pages/dan-first.astro` elején vannak.
+- `frontend/public/dan-first/dan-first-katalogus.pdf` – a letölthető DAN FIRST katalógus (új katalógusnál ugyanezzel a névvel kell felülírni)
+- `frontend/src/content/szovegek/lamello.md` – Lamelló bemutatkozás
+- `shared/studio.json` – cím, nyitvatartás, telefon, e-mail, kapcsolattartó, cégadatok, „Mit hozz magaddal?” lista (az oldal és a visszaigazoló levél is használja)
+- `backend/foglalas.json` – az időpontfoglalás minden beállítása (lásd lent)
+- `frontend/src/assets/` – képek és logók (az Astro build közben webre optimalizálja őket)
 
 A `csoportok` mezőben egy modell több csoportban is szerepelhet (pl. `csoportok: [fogantyus, videkies]`). A lehetséges értékek: `fogantyu-nelkuli`, `fogantyus`, `videkies`, `kis-meretu`. Ezekből lesznek a Konyhák oldal szűrőgombjai.
 
-Új konyhamodell: másolj le egy meglévő md fájlt, írd át, és tedd a képeit a `src/assets/konyhak/<modell>/` mappába.
+Új konyhamodell: másolj le egy meglévő md fájlt, írd át, és tedd a képeit a `frontend/src/assets/konyhak/<modell>/` mappába.
 
 ## Arculat
 
-A színek és fontok a DANKÜCHEN Markenidentität (2026) alapján a `src/styles/global.css` fájlban vannak. A DAN piros csak a fő foglalás gombon szerepel, a stúdióblokk és a jelvény Tamarillo színű (exkluzív stúdió).
+A színek és fontok a DANKÜCHEN Markenidentität (2026) alapján a `frontend/src/styles/global.css` fájlban vannak. A DAN piros csak a fő foglalás gombon szerepel, a stúdióblokk és a jelvény Tamarillo színű (exkluzív stúdió).
 
 ### Márkafontok
 
 A Gazpacho Medium Italic és a GT Walsheim Regular licencköteles (webes használatra licencelt). A woff2 fájlok a repóban vannak:
 
 ```
-public/fonts/Gazpacho-MediumItalic.woff2
-public/fonts/GT-Walsheim-Regular.woff2
+frontend/public/fonts/Gazpacho-MediumItalic.woff2
+frontend/public/fonts/GT-Walsheim-Regular.woff2
 ```
 
 A woff2 fájlok az eredeti OTF-ekből készülnek, csak az oldalhoz szükséges karakterekkel (latin, magyar ékezetek, tipográfiai jelek, €, →). Így fontonként kb. 15–19 KB-osak a ~90–100 KB-os OTF helyett. Előállításuk (a fontTools és a brotli Python csomag kell hozzá: `pip install fonttools brotli`):
@@ -141,20 +153,20 @@ A woff2 fájlok az eredeti OTF-ekből készülnek, csak az oldalhoz szükséges 
 ```sh
 KARAKTEREK='U+0020-007E,U+00A0-00FF,U+0150-0151,U+0170-0171,U+2013-2014,U+2018-201E,U+2022,U+2026,U+20AC,U+2192'
 python3 -m fontTools.subset Gazpacho-MediumItalic.otf --flavor=woff2 --unicodes="$KARAKTEREK" \
-  --layout-features='kern,liga,calt' --output-file=public/fonts/Gazpacho-MediumItalic.woff2
+  --layout-features='kern,liga,calt' --output-file=frontend/public/fonts/Gazpacho-MediumItalic.woff2
 python3 -m fontTools.subset GT-Walsheim-LC-Regular.otf --flavor=woff2 --unicodes="$KARAKTEREK" \
-  --layout-features='kern,liga,calt' --output-file=public/fonts/GT-Walsheim-Regular.woff2
+  --layout-features='kern,liga,calt' --output-file=frontend/public/fonts/GT-Walsheim-Regular.woff2
 ```
 
 Ha a szövegbe új különleges karakter kerül (pl. más nyíl vagy ×), add hozzá a `KARAKTEREK` listához, és generáld újra a fájlokat. Különben az a karakter tartalék fontban jelenik meg.
 
-A `@font-face` szabályok és a fontok előtöltése (`<link rel="preload">`) a `src/layouts/Layout.astro` `<head>` részében vannak, így a böngésző már a HTML-ből tudja, mit kell letöltenie, és a `base` beállítást is követik. Ha a fájlok hiányoznak, az oldal rendszerfontokat használ (Georgia a címsorokhoz, a rendszer sans-serif fontja a szöveghez).
+A `@font-face` szabályok és a fontok előtöltése (`<link rel="preload">`) a `frontend/src/layouts/Layout.astro` `<head>` részében vannak, így a böngésző már a HTML-ből tudja, mit kell letöltenie, és a `base` beállítást is követik. Ha a fájlok hiányoznak, az oldal rendszerfontokat használ (Georgia a címsorokhoz, a rendszer sans-serif fontja a szöveghez).
 
 ## Időpontfoglaló rendszer
 
-Az oldalak statikusak maradnak, csak két API-végpont fut Node-on (`src/pages/api/`). A foglalások SQLite-ban vannak, a dupla foglalást az adatbázis egyedi indexe zárja ki. A látogató csak a szabad órákat kapja meg, és a szerver minden beküldésnél újra ellenőrzi az időpontot. Admin felület nincs, minden beállítás a `src/data/foglalas.json` fájlban van.
+A frontend statikus, a foglalást a külön futó backend intézi (`backend/`). A foglalások SQLite-ban vannak, a dupla foglalást az adatbázis egyedi indexe zárja ki. A látogató csak a szabad órákat kapja meg, és a szerver minden beküldésnél újra ellenőrzi az időpontot. Admin felület nincs, minden beállítás a `backend/foglalas.json` fájlban van.
 
-**A JSON módosítása után telepíteni kell** (`deploy/telepit.sh`), mert a fájl a buildbe kerül. Hibás értékre az `npm test` hibát ad, és a telepítés nem indul el.
+**A JSON módosítása után telepíteni kell** (`deploy/telepit.sh backend`), mert a backend induláskor olvassa be. Hibás értékre az `npm test` hibát ad, és a telepítés nem indul el.
 
 | Feladat | Mező |
 |---|---|
@@ -171,32 +183,38 @@ Az oldalak statikusak maradnak, csak két API-végpont fut Node-on (`src/pages/a
 | A küldő szerver teljes domainneve, ezzel mutatkozik be a levelezőszervernek | `email.szerverNev` |
 | A feladó neve és címe | `email.feladoNev`, `felado` |
 | A levelek tárgya (a `{idopont}` és a `{nev}` helyére a foglalás adatai kerülnek) | `email.targyLatogatonak`, `targyStudionak` |
-| A visszaigazoló levél és az oldal „Mit hozz magaddal?” listája | `mitHozzMagaddal` |
 
 - **Ünnepnapok:** a törvényes ünnepeket a kód számolja ki, a mozgó ünnepeket is. Az áthelyezett pihenőnapok évente rendeletben jelennek meg, ezeket kézzel kell a `pihenonapok` listába írni (a szombati munkanapokat nem, mert a stúdió szombaton zárva van). A 2026-os adat a 10/2025. (IV. 30.) NGM rendeletből van, **a 2027-es rendelet adatai még nincsenek felvéve**.
-- **Lemondás:** a foglalás azonosítója a stúdiónak küldött levélben szerepel. Fel kell venni a `lemondottFoglalasok` listába és telepíteni, ettől az óra újra szabad. A látogató nem kap automatikus levelet, őt a stúdió értesíti.
+- **Lemondás:** a foglalás azonosítója a stúdiónak küldött levélben szerepel. Fel kell venni a `lemondottFoglalasok` listába és telepíteni (`deploy/telepit.sh backend`), ettől az óra újra szabad. A látogató nem kap automatikus levelet, őt a stúdió értesíti.
 - **Foglalás megtekintése és törlése a szerveren:** `deploy/foglalasok.mjs` (a használata a fájl elején). A 2 évnél régebbi foglalások automatikusan törlődnek.
-- **E-mail:** a látogató visszaigazolást kap, az `ertesitesiCimek` minden címe értesítést, mindkettő `.ics` naptármelléklettel. A jelszó nem lehet a JSON-ban, mert az a gitbe kerül: az `SMTP_JELSZO` környezeti változóban van (`.env.example`). Nélküle a foglalás működik, de nem megy ki levél.
+- **E-mail:** a látogató visszaigazolást kap, az `ertesitesiCimek` minden címe értesítést, mindkettő `.ics` naptármelléklettel. A jelszó nem lehet a JSON-ban, mert az a gitbe kerül: az `SMTP_JELSZO` környezeti változóban van (`backend/.env.example`). Nélküle a foglalás működik, de nem megy ki levél.
 - **Visszaélés ellen:** rejtett `_gotcha` mező, `maxAktivFoglalas`, és IP-nként 10 percenként 5 kérés (csak memóriában, IP-cím nem kerül az adatbázisba).
-- **Fejlesztés:** az `npm run dev` mindent elindít, az adatbázis a gitből kizárt `data/foglalasok.db`, levél nem megy ki.
+- **Fejlesztés:** az `npm run dev` mindent elindít, az adatbázis a gitből kizárt `backend/data/foglalasok.db`, levél nem megy ki.
 
 ## Telepítés
 
-A telepítés a saját gépről, a repóból indul, és az oldalt és az API-t is frissíti:
+A telepítés a saját gépről, a repóból indul. A két alkalmazás külön is telepíthető:
 
 ```sh
-deploy/telepit.sh
+deploy/telepit.sh            # mindkettő
+deploy/telepit.sh frontend   # szövegek, képek, oldalak; a foglalási szolgáltatás nem indul újra
+deploy/telepit.sh backend    # foglalas.json, API-kód
 ```
 
-Sorban ezt csinálja: lefuttatja a teszteket, buildel `BASE_PATH=/dankuchen` értékkel, elmenti a szerveren a jelenlegi statikus oldalt (`/root/dankuchen-mentes-<dátum>`, az 5 legutóbbi marad), feltölti a fájlokat, telepíti a függőségeket, újraindítja a szolgáltatást, és ellenőrzi, hogy az API válaszol. Hibás `foglalas.json` vagy bukó teszt esetén nem tölt fel semmit. Azt tölti fel, ami a munkakönyvtárban van, a nem commitolt változásokkal együtt.
+A `shared/` mappa módosítása után mindkettőt telepíteni kell.
+
+- **Frontend:** buildel `BASE_PATH=/dankuchen` értékkel, elmenti a szerveren a jelenlegi statikus oldalt (`/root/dankuchen-mentes-<dátum>`, az 5 legutóbbi marad), majd feltölti az újat.
+- **Backend:** lefuttatja a teszteket, feltölti a fájlokat, telepíti a függőségeket, újraindítja a szolgáltatást, és ellenőrzi, hogy az API válaszol. Hibás `foglalas.json` vagy bukó teszt esetén nem tölt fel semmit.
+
+Azt tölti fel, ami a munkakönyvtárban van, a nem commitolt változásokkal együtt.
 
 ### Mi hová kerül
 
 | A repóból | A szerveren | Tartalma |
 |---|---|---|
-| `dist/client/` | `/var/www/dankuchen/` | statikus oldal |
-| `dist/server/` | `/opt/dankuchen/server/` | API kód |
-| `package.json`, `package-lock.json` | `/opt/dankuchen/` | ezekből települ a `node_modules` (`npm ci`) |
+| `frontend/dist/` | `/var/www/dankuchen/` | statikus oldal |
+| `backend/` (`node_modules`, `test`, `data`, `.env*` nélkül) | `/opt/dankuchen/backend/` | API kód és `foglalas.json`, helyben települ a `node_modules` (`npm ci`) |
+| `shared/` | `/opt/dankuchen/shared/` | közös adatok és szabályok |
 | `deploy/foglalasok.mjs`, `deploy/mentes.mjs` | `/opt/dankuchen/` | segédszkriptek |
 
 Ezeket a telepítés nem érinti, csak a szerveren léteznek:
@@ -236,12 +254,16 @@ sudo -u dankuchen node /opt/dankuchen/foglalasok.mjs lista    # közelgő foglal
 
 | Mit | Hol | Utána |
 |---|---|---|
-| Foglalási beállítások, szövegek, képek, kód | a repóban, a saját gépen | `deploy/telepit.sh` |
+| Szövegek, képek, oldalak | `frontend/`, a saját gépen | `deploy/telepit.sh frontend` |
+| Foglalási beállítások, API-kód | `backend/`, a saját gépen | `deploy/telepit.sh backend` |
+| Cégadatok, „Mit hozz magaddal?”, foglalási szabályok | `shared/`, a saját gépen | `deploy/telepit.sh` |
 | SMTP-jelszó, adatbázis helye | `/etc/dankuchen/dankuchen.env`, a szerveren | `systemctl restart dankuchen` |
 | Port, futtatás módja | `/etc/systemd/system/dankuchen.service`, a szerveren | `systemctl daemon-reload && systemctl restart dankuchen` |
 | API továbbítása, jelszóvédelem | `/etc/apache2/sites-available/default-ssl.conf`, a szerveren | `apache2ctl configtest && systemctl reload apache2` |
 
-A `foglalas.json` tartalma a buildbe kerül, ezért a szerveren nincs ilyen fájl, és a `/opt/dankuchen/server/` fájljait nem érdemes szerkeszteni, mert a következő telepítés felülírja őket. A port módosításához az Apache-szabályt és a `deploy/telepit.sh` ellenőrző hívását is át kell írni.
+A `foglalas.json` a szerveren is megvan (`/opt/dankuchen/backend/foglalas.json`), sürgős esetben ott is átírható, és a `systemctl restart dankuchen` után érvényes. Ilyenkor nem fut le a teszt, így hibás JSON-nal a szolgáltatás nem indul el (`journalctl -u dankuchen` mutatja az okot), a következő telepítés pedig felülírja, ezért a változást a repóba is be kell vezetni.
+
+A port módosításához az Apache-szabályt és a `deploy/telepit.sh` ellenőrző hívását is át kell írni.
 
 ### Egyszeri szerverbeállítás
 
@@ -271,4 +293,4 @@ apache2ctl configtest && systemctl reload apache2
 
 ### Éles indulás
 
-A `<Location /dankuchen/api>` jelszóvédelmet az oldal `<Directory>` védelmével együtt le kell venni. Ha az oldal saját domainre kerül, a `deploy/telepit.sh` `BASE_PATH` értékét, az API-ellenőrzés útvonalát és az Apache-szabályt is módosítani kell, mert mindegyikben szerepel a `/dankuchen` előtag.
+A `<Location /dankuchen/api>` jelszóvédelmet az oldal `<Directory>` védelmével együtt le kell venni. Ha az oldal saját domainre kerül, a `deploy/telepit.sh` `BASE_PATH` értékét és az Apache-szabályt is módosítani kell, mert mindkettőben szerepel a `/dankuchen` előtag. A backendet ez nem érinti.

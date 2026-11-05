@@ -8,7 +8,7 @@ import Jelveny from '../components/Jelveny.astro';
 import heroKep from '../assets/konyhak/silbermond/silbermond-eiche-nordic-anthrazit.jpg';
 import studioKep from '../assets/konyhak/living/living-kombination-08.jpg';
 import happyPlace from '../assets/logok/my-happy-place-fekete.png';
-import studio from '../data/studio.json';
+import studio from '../../../shared/studio.json';
 
 const kiemelt = (await getCollection('konyhak', (k) => k.data.fooldalon)).sort((a, b) => a.data.sorrend - b.data.sorrend);
 

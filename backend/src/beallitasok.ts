@@ -1,6 +1,6 @@
-import { z } from 'astro/zod';
-import adatok from '../../data/foglalas.json' with { type: 'json' };
-import { ervenyesNapFormatum } from './idopontok.ts';
+import { z } from 'zod';
+import { ervenyesNapFormatum } from '../../shared/idopontok.ts';
+import adatok from '../foglalas.json' with { type: 'json' };
 
 const nap = z.string().refine(ervenyesNapFormatum, 'ÉÉÉÉ-HH-NN formátumú, létező dátum kell');
 const ora = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'ÓÓ:PP formátum kell');
@@ -29,7 +29,6 @@ const sema = z
       targyLatogatonak: targy,
       targyStudionak: targy,
     }),
-    mitHozzMagaddal: z.array(z.string().min(1)),
   })
   .superRefine((sz, ctx) => {
     if (sz.legkesobbNapMulva < sz.legkorabbanNapMulva) {

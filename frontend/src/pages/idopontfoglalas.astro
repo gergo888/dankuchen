@@ -3,8 +3,7 @@ import { url } from '../utils/url';
 import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import heroKep from '../assets/konyhak/amica/amica-eiche-nordic-fjord-grun.jpg';
-import studio from '../data/studio.json';
-import foglalas from '../data/foglalas.json';
+import studio from '../../../shared/studio.json';
 
 const tel = studio.telefon.replace(/\s/g, '');
 
@@ -71,7 +70,7 @@ const lepesek = [
       <aside class="hozd">
         <h2>Mit hozz magaddal?</h2>
         <ul>
-          {foglalas.mitHozzMagaddal.map((t) => <li>{t}</li>)}
+          {studio.mitHozzMagaddal.map((t) => <li>{t}</li>)}
         </ul>
         <div class="hozd__tel">
           <strong>Inkább telefonálnál?</strong>
@@ -101,7 +100,7 @@ const lepesek = [
 </Layout>
 
 <script>
-  import { alapertelmezettNap, napFelirat, oraFelirat } from '../lib/foglalas/idopontok.ts';
+  import { alapertelmezettNap, napFelirat, oraFelirat } from '../../../shared/idopontok.ts';
 
   const urlap = document.querySelector<HTMLFormElement>('form.urlap')!;
   const napMezo = urlap.querySelector<HTMLSelectElement>('select[name="nap"]')!;
