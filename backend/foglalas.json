@@ -12,11 +12,11 @@
   "email": {
     "smtpHost": "mail.fws.hu",
     "smtpPort": 587,
-    "szerverNev": "fabutorwebaruhaz.hu",
-    "felhasznalo": "szabo.gergely@lamello.hu",
+    "szerverNev": "dankuchenkaposvar.hu",
+    "felhasznalo": "dan@lamello.hu",
     "feladoNev": "DANKÜCHEN Exkluzív Stúdió Kaposvár",
-    "felado": "szabo.gergely@lamello.hu",
-    "ertesitesiCimek": ["szabo.gergely@lamello.hu", "szabogergely100@gmail.com"],
+    "felado": "dan@lamello.hu",
+    "ertesitesiCimek": ["szabo.gergely@lamello.hu", "dan@lamello.hu"],
     "targyLatogatonak": "Időpontfoglalás visszaigazolása: {idopont}",
     "targyStudionak": "Új időpontfoglalás: {idopont} – {nev}"
   }

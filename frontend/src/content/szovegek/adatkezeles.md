@@ -7,9 +7,9 @@ A LAMELLÓ Kft. (7400 Kaposvár, Dombóvári út 1., adószám: 11223717-2-14, c
 
 A természetes személyeknek a személyes adatok kezelése tekintetében történő védelméről és az ilyen adatok szabad áramlásáról, valamint a 95/46/EK rendelet hatályon kívül helyezéséről (általános adatvédelmi rendelet) AZ EURÓPAI PARLAMENT ÉS A TANÁCS (EU) 2016/679 RENDELETE (2016. április 27.) szerint az alábbi tájékoztatást adjuk.
 
-Jelen adatvédelmi tájékoztató az alábbi oldal adatkezelését szabályozza: https://dankuchenexkluzivstudio-kaposvar.hu/
+Jelen adatvédelmi tájékoztató az alábbi oldal adatkezelését szabályozza: https://dankuchenkaposvar.hu/
 
-Az adatkezelési tájékoztató elérhető az alábbi oldalról: https://dankuchenexkluzivstudio-kaposvar.hu/adatkezeles/
+Az adatkezelési tájékoztató elérhető az alábbi oldalról: https://dankuchenkaposvar.hu/adatkezeles/
 
 A tájékoztató módosításai a fenti címen történő közzététellel lépnek hatályba.
 
@@ -280,4 +280,4 @@ A tájékoztató elkészítése során figyelemmel voltunk az alábbi jogszabál
 - 2003\. évi C. törvény az elektronikus hírközlésről (kifejezetten a 155. §-a);
 - A Nemzeti Adatvédelmi és Információszabadság Hatóság ajánlása az előzetes tájékoztatás adatvédelmi követelményeiről.
 
-Hatályos: 2026. november 2-től.
+Hatályos: 2026. november 5-től.

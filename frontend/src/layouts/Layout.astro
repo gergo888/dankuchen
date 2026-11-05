@@ -3,6 +3,8 @@ import { url } from '../utils/url';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import fontCim from '../assets/fonts/Gazpacho-MediumItalic.woff2?url';
+import fontSzoveg from '../assets/fonts/GT-Walsheim-Regular.woff2?url';
 
 interface Props {
   title: string;
@@ -13,10 +15,7 @@ interface Props {
 const { title, description, aktiv } = Astro.props;
 const teljesCim = title === 'Főoldal' ? 'DANKÜCHEN Exkluzív Stúdió Kaposvár' : `${title} – DANKÜCHEN Kaposvár`;
 
-// Márkafontok (public/fonts, lásd README). Itt és nem a global.css-ben, mert a CSS-beli
-// abszolút útvonal nem követné a `base` beállítást.
-const fontCim = url('/fonts/Gazpacho-MediumItalic.woff2');
-const fontSzoveg = url('/fonts/GT-Walsheim-Regular.woff2');
+// Márkafontok (lásd README). A fájlnevükbe a build hash-t tesz, így hosszan gyorsítótárazhatók.
 const fontFace = `
 @font-face {
   font-family: 'Gazpacho';

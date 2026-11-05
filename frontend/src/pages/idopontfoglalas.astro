@@ -43,9 +43,11 @@ const lepesek = [
         <label>Település<input type="text" name="telepules" autocomplete="address-level2" /></label>
         <label
           >Dátum *
-          <select name="nap" required disabled>
-            <option value="">Betöltés…</option>
-          </select>
+          <span class="napmezo">
+            <select name="nap" required disabled>
+              <option value="">Betöltés…</option>
+            </select>
+          </span>
         </label>
         <label
           >Óra *
@@ -156,6 +158,58 @@ const lepesek = [
   }
 
   napMezo.addEventListener('change', orakFrissitese);
+
+  // A natív lenyíló magassága nem korlátozható, és a sok nap nem fér el a képernyőn. Egérrel kezelt eszközön
+  // ezért nyitáskor 7 soros listává alakul a mező. Telefonon a rendszer saját választója nyílik meg.
+  if (matchMedia('(pointer: fine)').matches) {
+    let nyitaskoriNap = '';
+    let nyitoKattintas = false;
+    const nyitva = () => napMezo.hasAttribute('size');
+    const nyit = () => {
+      nyitaskoriNap = napMezo.value;
+      napMezo.size = 7;
+    };
+    const zar = () => napMezo.removeAttribute('size');
+
+    napMezo.addEventListener('mousedown', (e) => {
+      if (nyitva()) {
+        nyitoKattintas = false;
+      } else if (e.button === 0) {
+        e.preventDefault();
+        napMezo.focus();
+        nyit();
+        nyitoKattintas = true;
+      }
+    });
+    napMezo.addEventListener('click', (e) => {
+      // A nyitó kattintás felengedése még ugyanide esik. A görgetősávra kattintás nyitva hagyja a listát.
+      const sorra = e.clientX - napMezo.getBoundingClientRect().left <= napMezo.clientWidth;
+      if (!nyitoKattintas && nyitva() && sorra) zar();
+      nyitoKattintas = false;
+    });
+    napMezo.addEventListener('blur', zar);
+    document.addEventListener('mousedown', (e) => {
+      if (!napMezo.contains(e.target as Node)) zar();
+    });
+    napMezo.addEventListener('keydown', (e) => {
+      if (!nyitva()) {
+        if (e.key === ' ' || e.key === 'Enter' || e.key === 'F4' || (e.altKey && e.key.startsWith('Arrow'))) {
+          e.preventDefault();
+          nyit();
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        napMezo.value = nyitaskoriNap;
+        orakFrissitese();
+        zar();
+      } else if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        zar();
+      } else if (e.key === 'Tab') {
+        zar();
+      }
+    });
+  }
 
   urlap.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -283,6 +337,29 @@ const lepesek = [
     font-size: 1rem;
     font-weight: 400;
     color: var(--fekete);
+  }
+  /* Lenyitva a lista a mező helyén, a többi mező fölött jelenik meg, így semmi nem mozdul el. */
+  .napmezo {
+    position: relative;
+    display: block;
+    min-height: 52px;
+  }
+  .napmezo select {
+    width: 100%;
+  }
+  /* A leghosszabb dátumnak a legkeskenyebb, 240 pixeles oszlopban is el kell férnie a görgetősáv mellett. */
+  .urlap .napmezo select[size] {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    padding: 2px;
+    font-size: 0.9375rem;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
+  }
+  /* A sorokat a script hozza létre, ezért nem kapják meg az Astro hatókör-jelölését. */
+  .napmezo select[size] :global(option) {
+    padding: 6px;
   }
   .urlap textarea {
     padding-block: 14px;

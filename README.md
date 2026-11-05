@@ -40,14 +40,14 @@ Ami mindkettőnek kell, a `shared/` mappában van.
 Böngésző
    │
    ▼
-Apache (443-as port)
-   ├─ /dankuchen/...      → /var/www/dankuchen      statikus oldalak (frontend)
-   └─ /dankuchen/api/...  → Node, 127.0.0.1:4322    szabad órák, foglalás (backend)
-                               ├─ SQLite fájl       /var/lib/dankuchen/foglalasok.db
-                               └─ SMTP              mail.fws.hu:587 (e-mailek)
+Apache (443-as port, dankuchenkaposvar.hu)
+   ├─ /...      → /var/www/dankuchen      statikus oldalak (frontend)
+   └─ /api/...  → Node, 127.0.0.1:4322    szabad órák, foglalás (backend)
+                     ├─ SQLite fájl       /var/lib/dankuchen/foglalasok.db
+                     └─ SMTP              mail.fws.hu:587 (e-mailek)
 ```
 
-A `/dankuchen` előtag a teszt szerver miatt van, és a frontend build `BASE_PATH` értékéből jön. Saját domainen a build `BASE_PATH` nélkül készül, az előtag ekkor eltűnik. A frontend belső linkjei ezért mindig a `url()` segédfüggvénnyel (`frontend/src/utils/url.ts`) készülnek. A backend az útvonal végét nézi, így mindkét esetben működik. Fejlesztéskor az Astro dev szervere továbbítja az `/api` kéréseket a backendnek (`frontend/astro.config.mjs`).
+Az oldal a `dankuchenkaposvar.hu` domain gyökerében fut, saját virtual hostban (`deploy/apache-dankuchen.conf`), a webáruházzal közös szerveren. A korábbi `fabutorwebaruhaz.hu/dankuchen` cím ide irányít. A frontend belső linkjei a `url()` segédfüggvénnyel (`frontend/src/utils/url.ts`) készülnek, így a build a `BASE_PATH` változóval alkönyvtárba is készíthető. A backend az útvonal végét nézi, ezért ez nem érinti. A `/_astro/` fájlok nevében hash van, ezért a böngésző egy évig tárolhatja őket, a HTML-t viszont mindig ellenőrzi. Fejlesztéskor az Astro dev szervere továbbítja az `/api` kéréseket a backendnek (`frontend/astro.config.mjs`).
 
 ### Könyvtárak
 
@@ -58,12 +58,11 @@ A `/dankuchen` előtag a teszt szerver miatt van, és a frontend build `BASE_PAT
 ├── .nvmrc                         Node verzió
 ├── frontend/                      statikus Astro-oldal
 │   ├── package.json               astro
-│   ├── astro.config.mjs           base útvonal, fejlesztői proxy az API-hoz
+│   ├── astro.config.mjs           base útvonal, CSS a HTML-be, fejlesztői proxy az API-hoz
 │   ├── public/                    változtatás nélkül kerül az oldalra
-│   │   ├── dan-first/             letölthető DAN FIRST katalógus
-│   │   └── fonts/                 márkafontok
+│   │   └── dan-first/             letölthető DAN FIRST katalógus
 │   └── src/
-│       ├── assets/                képek és logók, a build webre optimalizálja őket
+│       ├── assets/                képek, logók (a build webre optimalizálja őket) és márkafontok
 │       ├── components/            Header, Footer, Galeria, Ikon, Jelveny, Szolgaltatasok
 │       ├── content/               md tartalom: konyhak, reszletek, szolgaltatasok, dan-first, szovegek
 │       ├── content.config.ts      a tartalomgyűjtemények sémái
@@ -144,8 +143,8 @@ A színek és fontok a DANKÜCHEN Markenidentität (2026) alapján a `frontend/s
 A Gazpacho Medium Italic és a GT Walsheim Regular licencköteles (webes használatra licencelt). A woff2 fájlok a repóban vannak:
 
 ```
-frontend/public/fonts/Gazpacho-MediumItalic.woff2
-frontend/public/fonts/GT-Walsheim-Regular.woff2
+frontend/src/assets/fonts/Gazpacho-MediumItalic.woff2
+frontend/src/assets/fonts/GT-Walsheim-Regular.woff2
 ```
 
 A woff2 fájlok az eredeti OTF-ekből készülnek, csak az oldalhoz szükséges karakterekkel (latin, magyar ékezetek, tipográfiai jelek, €, →). Így fontonként kb. 15–19 KB-osak a ~90–100 KB-os OTF helyett. Előállításuk (a fontTools és a brotli Python csomag kell hozzá: `pip install fonttools brotli`):
@@ -153,14 +152,14 @@ A woff2 fájlok az eredeti OTF-ekből készülnek, csak az oldalhoz szükséges 
 ```sh
 KARAKTEREK='U+0020-007E,U+00A0-00FF,U+0150-0151,U+0170-0171,U+2013-2014,U+2018-201E,U+2022,U+2026,U+20AC,U+2192'
 python3 -m fontTools.subset Gazpacho-MediumItalic.otf --flavor=woff2 --unicodes="$KARAKTEREK" \
-  --layout-features='kern,liga,calt' --output-file=frontend/public/fonts/Gazpacho-MediumItalic.woff2
+  --layout-features='kern,liga,calt' --output-file=frontend/src/assets/fonts/Gazpacho-MediumItalic.woff2
 python3 -m fontTools.subset GT-Walsheim-LC-Regular.otf --flavor=woff2 --unicodes="$KARAKTEREK" \
-  --layout-features='kern,liga,calt' --output-file=frontend/public/fonts/GT-Walsheim-Regular.woff2
+  --layout-features='kern,liga,calt' --output-file=frontend/src/assets/fonts/GT-Walsheim-Regular.woff2
 ```
 
-Ha a szövegbe új különleges karakter kerül (pl. más nyíl vagy ×), add hozzá a `KARAKTEREK` listához, és generáld újra a fájlokat. Különben az a karakter tartalék fontban jelenik meg.
+Ha a szövegbe új különleges karakter kerül (pl. más nyíl vagy ×), add hozzá a `KARAKTEREK` listához, és generáld újra a fájlokat. Különben az a karakter tartalék fontban jelenik meg. A build hash-t tesz a fájlnévbe, ezért az új változatot a visszatérő látogatók is azonnal megkapják.
 
-A `@font-face` szabályok és a fontok előtöltése (`<link rel="preload">`) a `frontend/src/layouts/Layout.astro` `<head>` részében vannak, így a böngésző már a HTML-ből tudja, mit kell letöltenie, és a `base` beállítást is követik. Ha a fájlok hiányoznak, az oldal rendszerfontokat használ (Georgia a címsorokhoz, a rendszer sans-serif fontja a szöveghez).
+A `@font-face` szabályok és a fontok előtöltése (`<link rel="preload">`) a `frontend/src/layouts/Layout.astro` `<head>` részében vannak, így a böngésző már a HTML-ből tudja, mit kell letöltenie. Ha a fontok nem töltődnek be, az oldal rendszerfontokat használ (Georgia a címsorokhoz, a rendszer sans-serif fontja a szöveghez).
 
 ## Időpontfoglaló rendszer
 
@@ -203,7 +202,7 @@ deploy/telepit.sh backend    # foglalas.json, API-kód
 
 A `shared/` mappa módosítása után mindkettőt telepíteni kell.
 
-- **Frontend:** buildel `BASE_PATH=/dankuchen` értékkel, elmenti a szerveren a jelenlegi statikus oldalt (`/root/dankuchen-mentes-<dátum>`, az 5 legutóbbi marad), majd feltölti az újat.
+- **Frontend:** buildel, elmenti a szerveren a jelenlegi statikus oldalt (`/root/dankuchen-mentes-<dátum>`, az 5 legutóbbi marad), majd feltölti az újat.
 - **Backend:** lefuttatja a teszteket, feltölti a fájlokat, telepíti a függőségeket, újraindítja a szolgáltatást, és ellenőrzi, hogy az API válaszol. Hibás `foglalas.json` vagy bukó teszt esetén nem tölt fel semmit.
 
 Azt tölti fel, ami a munkakönyvtárban van, a nem commitolt változásokkal együtt.
@@ -231,7 +230,7 @@ A `deploy/` mappa többi fájlja egyszeri szerverbeállításhoz kell, a `telepi
 |---|---|---|
 | `deploy/dankuchen.service` | `/etc/systemd/system/` | futtatja a Node-ot |
 | `deploy/dankuchen-mentes.service`, `.timer` | `/etc/systemd/system/` | napi adatbázis-mentés 3:30-kor (a szerver UTC szerint) |
-| `deploy/apache-dankuchen.conf` | a tartalma a `/etc/apache2/sites-available/default-ssl.conf` fájlban | továbbítja az API-kéréseket a Node-nak |
+| `deploy/apache-dankuchen.conf` | `/etc/apache2/sites-available/zz-dankuchenkaposvar.hu.conf` | a domain virtual hostja: kiszolgálja az oldalt, és továbbítja az API-kéréseket a Node-nak |
 
 ### Szolgáltatások a szerveren
 
@@ -259,7 +258,7 @@ sudo -u dankuchen node /opt/dankuchen/foglalasok.mjs lista    # közelgő foglal
 | Cégadatok, „Mit hozz magaddal?”, foglalási szabályok | `shared/`, a saját gépen | `deploy/telepit.sh` |
 | SMTP-jelszó, adatbázis helye | `/etc/dankuchen/dankuchen.env`, a szerveren | `systemctl restart dankuchen` |
 | Port, futtatás módja | `/etc/systemd/system/dankuchen.service`, a szerveren | `systemctl daemon-reload && systemctl restart dankuchen` |
-| API továbbítása, jelszóvédelem | `/etc/apache2/sites-available/default-ssl.conf`, a szerveren | `apache2ctl configtest && systemctl reload apache2` |
+| API továbbítása, a domain beállításai | `/etc/apache2/sites-available/zz-dankuchenkaposvar.hu.conf`, a szerveren | `apache2ctl configtest && systemctl reload apache2` |
 
 A `foglalas.json` a szerveren is megvan (`/opt/dankuchen/backend/foglalas.json`), sürgős esetben ott is átírható, és a `systemctl restart dankuchen` után érvényes. Ilyenkor nem fut le a teszt, így hibás JSON-nal a szolgáltatás nem indul el (`journalctl -u dankuchen` mutatja az okot), a következő telepítés pedig felülírja, ezért a változást a repóba is be kell vezetni.
 
@@ -286,11 +285,12 @@ systemctl daemon-reload
 systemctl enable dankuchen dankuchen-mentes.timer
 systemctl start dankuchen-mentes.timer
 
-# Apache: előbb a deploy/apache-dankuchen.conf tartalmát kell a virtual hostba írni
-a2enmod proxy_http
+# Apache: a tanúsítvány kéréséhez a 80-as virtual hostnak már élnie kell, a 443-as rész pedig csak a tanúsítvánnyal tölthető be.
+# Előbb a deploy/apache-dankuchen.conf 80-as blokkját kell a /etc/apache2/sites-available/zz-dankuchenkaposvar.hu.conf fájlba írni
+a2enmod proxy_http headers
+a2ensite zz-dankuchenkaposvar.hu
+apache2ctl configtest && systemctl reload apache2
+certbot certonly --apache -d dankuchenkaposvar.hu -d www.dankuchenkaposvar.hu --deploy-hook "systemctl reload apache2"
+# Utána a fájl teljes tartalma kerül a helyére
 apache2ctl configtest && systemctl reload apache2
 ```
-
-### Éles indulás
-
-A `<Location /dankuchen/api>` jelszóvédelmet az oldal `<Directory>` védelmével együtt le kell venni. Ha az oldal saját domainre kerül, a `deploy/telepit.sh` `BASE_PATH` értékét és az Apache-szabályt is módosítani kell, mert mindkettőben szerepel a `/dankuchen` előtag. A backendet ez nem érinti.

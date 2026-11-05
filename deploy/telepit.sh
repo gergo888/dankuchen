@@ -22,7 +22,7 @@ if [ "$CEL" != frontend ]; then
   npm --prefix backend test
 fi
 if [ "$CEL" != backend ]; then
-  BASE_PATH=/dankuchen npm --prefix frontend run build
+  npm --prefix frontend run build
 fi
 
 if [ "$CEL" != backend ]; then
@@ -36,5 +36,5 @@ if [ "$CEL" != frontend ]; then
   rsync -az --delete --chown=root:root --exclude node_modules --exclude test --exclude data --exclude '.env*' -e "$SSH_OPCIOK" backend/ "$SZERVER:$APP/backend/"
   rsync -az --delete --chown=root:root -e "$SSH_OPCIOK" shared/ "$SZERVER:$APP/shared/"
   rsync -az --chown=root:root -e "$SSH_OPCIOK" deploy/foglalasok.mjs deploy/mentes.mjs "$SZERVER:$APP/"
-  $SSH_OPCIOK "$SZERVER" "cd $APP/backend && npm ci --omit=dev --ignore-scripts --no-audit --no-fund && systemctl restart dankuchen && sleep 2 && curl -fsS -o /dev/null http://127.0.0.1:4322/dankuchen/api/szabad-idopontok && echo 'A foglalási API válaszol.'"
+  $SSH_OPCIOK "$SZERVER" "cd $APP/backend && npm ci --omit=dev --ignore-scripts --no-audit --no-fund && systemctl restart dankuchen && sleep 2 && curl -fsS -o /dev/null http://127.0.0.1:4322/api/szabad-idopontok && echo 'A foglalási API válaszol.'"
 fi
