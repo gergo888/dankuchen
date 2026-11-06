@@ -34,8 +34,9 @@ const lepesek = [
 
   <section class="szekcio" aria-label="Foglalás">
     <div class="tarolo foglalas">
-      <form class="urlap" data-szabad={url('/api/szabad-idopontok')} data-foglalas={url('/api/foglalas')} data-koszonjuk={url('/koszonjuk/')}>
+      <form class="urlap" data-szabad={url('/api/szabad-idopontok')} data-foglalas={url('/api/foglalas')} data-koszonjuk={url('/koszonjuk/')} data-adatkezeles={url('/adatkezeles/')}>
         <h2>Időpontfoglalás</h2>
+        <p class="urlap__siker teljes" role="status" hidden></p>
         <noscript class="teljes">
           <p class="urlap__hiba">Az online foglaláshoz JavaScript szükséges. Hívj minket: <a href={`tel:${tel}`}>{studio.telefon}</a></p>
         </noscript>
@@ -106,11 +107,13 @@ const lepesek = [
 
 <script>
   import { alapertelmezettNap, napFelirat, oraFelirat } from '../../../shared/idopontok.ts';
+  import { eszkozokRegisztralasa, type FoglalasEredmeny } from '../utils/webmcp';
 
   const urlap = document.querySelector<HTMLFormElement>('form.urlap')!;
   const napMezo = urlap.querySelector<HTMLSelectElement>('select[name="nap"]')!;
   const oraMezo = urlap.querySelector<HTMLSelectElement>('select[name="ora"]')!;
   const hiba = urlap.querySelector<HTMLElement>('.urlap__hiba')!;
+  const siker = urlap.querySelector<HTMLElement>('.urlap__siker')!;
   const gomb = urlap.querySelector<HTMLButtonElement>('button[type="submit"]')!;
   const GOMB_FELIRAT = gomb.textContent!;
 
@@ -141,8 +144,10 @@ const lepesek = [
     if (orak.includes(korabbi)) oraMezo.value = korabbi;
   }
 
+  // A szabad időpontok betöltése és a két lista frissítése. Sikertelen betöltésnél false.
   async function szabadIdopontokBetoltese() {
     const korabbi = napMezo.value;
+    let sikerult = true;
     try {
       const valasz = await fetch(urlap.dataset.szabad!, { headers: { Accept: 'application/json' } });
       if (!valasz.ok) throw new Error(`Szabad időpontok: ${valasz.status}`);
@@ -150,6 +155,7 @@ const lepesek = [
     } catch (err) {
       console.error(err);
       napok = {};
+      sikerult = false;
       hibaMutatasa('Most nem tudjuk betölteni a szabad időpontokat.');
     }
     const lista = Object.keys(napok);
@@ -158,7 +164,27 @@ const lepesek = [
     gomb.disabled = lista.length === 0;
     if (lista.length > 0) napMezo.value = lista.includes(korabbi) ? korabbi : alapertelmezettNap(lista, new Date());
     orakFrissitese();
+    return sikerult;
   }
+
+  // A foglalás beküldése. Az űrlap és az AI-agentek eszköze (utils/webmcp.ts) is ezt használja.
+  async function foglalasKuldese(adat: Record<string, string>): Promise<FoglalasEredmeny> {
+    try {
+      const valasz = await fetch(urlap.dataset.foglalas!, {
+        method: 'POST',
+        body: JSON.stringify(adat),
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      });
+      if (valasz.ok) return { ok: true };
+      const { hiba: kod = '', mezok = [] } = await valasz.json().catch(() => ({}));
+      return { ok: false, kod, mezok };
+    } catch (err) {
+      console.error(err);
+      return { ok: false, kod: '', mezok: [] };
+    }
+  }
+
+  const hibaSzoveg = (kod: string) => UZENETEK[kod] ?? 'Nem sikerült elküldeni a foglalást. Próbáld újra.';
 
   napMezo.addEventListener('change', orakFrissitese);
 
@@ -217,25 +243,16 @@ const lepesek = [
   urlap.addEventListener('submit', async (e) => {
     e.preventDefault();
     hiba.hidden = true;
+    siker.hidden = true;
     gomb.disabled = true;
     gomb.textContent = 'Küldés…';
-    try {
-      const valasz = await fetch(urlap.dataset.foglalas!, {
-        method: 'POST',
-        body: JSON.stringify(Object.fromEntries(new FormData(urlap))),
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      });
-      if (valasz.ok) {
-        location.href = urlap.dataset.koszonjuk!;
-        return;
-      }
-      const { hiba: kod } = await valasz.json().catch(() => ({ hiba: '' }));
-      hibaMutatasa(UZENETEK[kod] ?? 'Nem sikerült elküldeni a foglalást. Próbáld újra.');
-      if (kod === 'foglalt' || kod === 'idopont') await szabadIdopontokBetoltese();
-    } catch (err) {
-      console.error(err);
-      hibaMutatasa('Nem sikerült elküldeni a foglalást. Próbáld újra.');
+    const eredmeny = await foglalasKuldese(Object.fromEntries(new FormData(urlap)) as Record<string, string>);
+    if (eredmeny.ok) {
+      location.href = urlap.dataset.koszonjuk!;
+      return;
     }
+    hibaMutatasa(hibaSzoveg(eredmeny.kod));
+    if (eredmeny.kod === 'foglalt' || eredmeny.kod === 'idopont') await szabadIdopontokBetoltese();
     gomb.disabled = false;
     gomb.textContent = GOMB_FELIRAT;
   });
@@ -248,6 +265,21 @@ const lepesek = [
   });
 
   szabadIdopontokBetoltese();
+
+  // Eszközök a böngészőben futó AI-agenteknek (WebMCP). Az agent foglalásánál nincs átirányítás,
+  // hogy az agent megkapja az eredményt; a látogató az űrlap fölötti sávban látja a foglalást.
+  eszkozokRegisztralasa({
+    szabadIdopontok: async () => ((await szabadIdopontokBetoltese()) ? { napok, hosszPerc } : null),
+    foglalas: foglalasKuldese,
+    hibaSzoveg,
+    sikeresFoglalas: (szoveg) => {
+      hiba.hidden = true;
+      siker.textContent = szoveg;
+      siker.hidden = false;
+      siker.scrollIntoView({ block: 'nearest' });
+    },
+    adatkezelesUrl: new URL(urlap.dataset.adatkezeles!, location.href).href,
+  });
 </script>
 
 <style>
@@ -393,6 +425,12 @@ const lepesek = [
   }
   .urlap__hiba {
     color: var(--tamarillo);
+    font-weight: 700;
+  }
+  .urlap__siker {
+    padding: 16px 20px;
+    border-left: 4px solid var(--zucchini);
+    background: var(--panna);
     font-weight: 700;
   }
 

@@ -174,6 +174,21 @@ Minden ezekhez szükséges adat a meglévő forrásokból készül a build közb
 - **`sitemap-index.xml`:** a köszönőoldal és a 404-es oldal nélkül. Ezeken `noindex` van.
 - **`llms.txt`:** rövid összefoglaló az AI-keresőknek a stúdió adataiból, a konyhamodellekből és a DAN FIRST csomagokból.
 
+### WebMCP: időpontfoglalás AI-agenteknek
+
+A [WebMCP](https://developer.chrome.com/docs/ai/webmcp) segítségével a böngészőben futó AI-agentek (pl. Gemini in Chrome) kattintgatás nélkül, típusos eszközökön keresztül használhatják a foglalást. Az eszközök az `/idopontfoglalas/` oldalon regisztrálódnak, a kódjuk a `frontend/src/utils/webmcp.ts` fájlban van:
+
+| Eszköz | Mit csinál |
+|---|---|
+| `szabad_idopontok` | Csak olvas. Paraméter nélkül a foglalható napokat adja vissza a szabad időpontok számával, `nap` megadásával az adott nap kezdési időpontjait. |
+| `idopont_foglalasa` | Valódi foglalást hoz létre, a foglaló és a stúdió is levelet kap. `consequentialHint` jelzéssel, így az agent vagy a Chrome megerősítést kérhet. Az `adatkezeles_elfogadva` paraméternek `true`-nak kell lennie, különben nem foglal. |
+
+Az eszközök ugyanazt a beküldést és ugyanazt a backendet használják, mint az űrlap, így a backend ellenőrzései és korlátai rájuk is érvényesek. Agentes foglalásnál nincs átirányítás a köszönőoldalra, mert akkor az agent nem kapná meg az eredményt. A látogató ilyenkor az űrlap fölötti sávban látja a foglalást.
+
+**Origin trial:** az API a Chrome-ban próbaidőszakban van. A látogatóknál a `Layout.astro` `<head>` részébe tett token kapcsolja be. A token a `webmcp.ts` fájlban van, a `https://dankuchenkaposvar.hu` címre szól, és **2027. március 30-án lejár**. Előtte meg kell újítani a [regisztrációs oldalon](https://developer.chrome.com/origintrials/#/register_trial/4163014905550602241), majd ki kell cserélni a fájlban.
+
+**Kipróbálás:** helyben a Chrome-ot a `chrome://flags/#enable-webmcp-testing` kapcsolóval vagy az `--enable-experimental-web-platform-features` indítási kapcsolóval kell futtatni. Ezután a konzolban a `document.modelContext.getTools()` hívás mutatja az eszközöket. Valódi agenttel a [Model Context Tool Inspector](https://chromewebstore.google.com/detail/model-context-tool-inspec/gbpdfapgefenggkahomfgkhfehlcenpd) bővítmény a legegyszerűbb, ehhez Gemini API-kulcs kell. Élesben a foglalás valódi leveleket küld.
+
 ## Időpontfoglaló rendszer
 
 A frontend statikus, a foglalást a külön futó backend intézi (`backend/`). A foglalások SQLite-ban vannak, a dupla foglalást az adatbázis egyedi indexe zárja ki. A látogató csak a szabad órákat kapja meg, és a szerver minden beküldésnél újra ellenőrzi az időpontot. Admin felület nincs, minden beállítás a `backend/foglalas.json` fájlban van.
