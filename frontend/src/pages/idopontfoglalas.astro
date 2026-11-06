@@ -4,8 +4,9 @@ import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import heroKep from '../assets/konyhak/amica/amica-eiche-nordic-fjord-grun.jpg';
 import studio from '../../../shared/studio.json';
+import { nemzetkoziTelefon } from '../utils/studio';
 
-const tel = studio.telefon.replace(/\s/g, '');
+const tel = nemzetkoziTelefon();
 
 const lepesek = [
   { cim: 'Időpontfoglalás', szoveg: 'Kiválasztod a neked megfelelő napot és órát.' },
@@ -19,6 +20,8 @@ const lepesek = [
   title="Időpontfoglalás"
   description="Foglalj időpontot látványtervezésre a DANKÜCHEN kaposvári exkluzív stúdiójában. 3D-s látványterv a te méreteid alapján, kötöttségek nélkül."
   aktiv="idopont"
+  kep={heroKep}
+  kepLeiras="DANKÜCHEN Amica konyha Eiche Nordic és fjordzöld frontokkal"
 >
   <section class="hero" aria-labelledby="cim">
     <Image src={heroKep} alt="" widths={[800, 1400, 2000]} sizes="100vw" loading="eager" class="hero__kep" />

@@ -4,11 +4,12 @@ import { getEntry, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import lamelloLogo from '../assets/logok/lamello.png';
 import studio from '../../../shared/studio.json';
+import { nemzetkoziTelefon } from '../utils/studio';
 
 const lamello = await getEntry('szovegek', 'lamello');
 if (!lamello) throw new Error('Hiányzik: src/content/szovegek/lamello.md');
 const { Content: LamelloSzoveg } = await render(lamello);
-const tel = studio.telefon.replace(/\s/g, '');
+const tel = nemzetkoziTelefon();
 ---
 
 <Layout

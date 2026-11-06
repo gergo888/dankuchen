@@ -4,9 +4,10 @@ import { Image } from 'astro:assets';
 import logoFeher from '../assets/logok/dankuchen-feher.png';
 import lamelloLogo from '../assets/logok/lamello.png';
 import studio from '../../../shared/studio.json';
+import { nemzetkoziTelefon } from '../utils/studio';
 
 const ev = new Date().getFullYear();
-const tel = studio.telefon.replace(/\s/g, '');
+const tel = nemzetkoziTelefon();
 ---
 
 <footer class="lablec">

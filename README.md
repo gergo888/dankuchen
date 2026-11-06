@@ -24,6 +24,9 @@ npm test         # a backend tesztjei: foglalási szabályok, API, foglalas.json
 | `/idopontfoglalas/` | `frontend/src/pages/idopontfoglalas.astro` – Látványtervezés foglalás |
 | `/koszonjuk/` | sikeres foglalás után |
 | `/adatkezeles/` | adatkezelési tájékoztató (`frontend/src/content/szovegek/adatkezeles.md`) |
+| nem létező cím | `frontend/src/pages/404.astro` – saját hibaoldal (az Apache `ErrorDocument` sora irányítja ide) |
+| `/robots.txt`, `/llms.txt` | `frontend/src/pages/robots.txt.ts`, `frontend/src/pages/llms.txt.ts` – lásd: Keresők és AI |
+| `/sitemap-index.xml` | a build készíti (`@astrojs/sitemap`) |
 | `/api/szabad-idopontok` | `backend/src/api.ts` – szabad órák |
 | `/api/foglalas` | `backend/src/api.ts` – foglalás beküldése |
 
@@ -160,6 +163,16 @@ python3 -m fontTools.subset GT-Walsheim-LC-Regular.otf --flavor=woff2 --unicodes
 Ha a szövegbe új különleges karakter kerül (pl. más nyíl vagy ×), add hozzá a `KARAKTEREK` listához, és generáld újra a fájlokat. Különben az a karakter tartalék fontban jelenik meg. A build hash-t tesz a fájlnévbe, ezért az új változatot a visszatérő látogatók is azonnal megkapják.
 
 A `@font-face` szabályok és a fontok előtöltése (`<link rel="preload">`) a `frontend/src/layouts/Layout.astro` `<head>` részében vannak, így a böngésző már a HTML-ből tudja, mit kell letöltenie. Ha a fontok nem töltődnek be, az oldal rendszerfontokat használ (Georgia a címsorokhoz, a rendszer sans-serif fontja a szöveghez).
+
+## Keresők és AI
+
+Minden ezekhez szükséges adat a meglévő forrásokból készül a build közben, külön karbantartást nem igényel:
+
+- **Strukturált adat (JSON-LD):** minden oldalon a stúdió helyi üzletként (`FurnitureStore`) a `shared/studio.json` adataiból: név, cím, telefon, e-mail, nyitvatartás. A DAN FIRST oldalon a csomagok termékként, a tartalomban megadott árral. A címet, a nyitvatartást, a telefonszámot és az árat a `frontend/src/utils/studio.ts` bontja fel. Ha valamelyik formátuma megváltozik (pl. `"Hétfő–péntek"`, `"8:00–16:00"`, `"2.399.000 Ft"`), a build hibával leáll, és megmondja, melyik mezővel van gond.
+- **Link előnézete** (Facebook, Messenger, Viber, e-mail): az `og:` adatok a `Layout.astro` fájlban vannak. A kép alapértelmezésben a főoldal hero képe, egy oldal a `kep` és a `kepLeiras` paraméterrel adhat sajátot.
+- **`robots.txt`:** minden robot, az AI-keresőké is, olvashatja az oldalt, csak az `/api/` tiltott.
+- **`sitemap-index.xml`:** a köszönőoldal és a 404-es oldal nélkül. Ezeken `noindex` van.
+- **`llms.txt`:** rövid összefoglaló az AI-keresőknek a stúdió adataiból, a konyhamodellekből és a DAN FIRST csomagokból.
 
 ## Időpontfoglaló rendszer
 

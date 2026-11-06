@@ -1,7 +1,8 @@
 ---
 import { url } from '../utils/url';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
+import { forintAr, STUDIO_ID } from '../utils/studio';
 import Layout from '../layouts/Layout.astro';
 import Ikon from '../components/Ikon.astro';
 import Galeria from '../components/Galeria.astro';
@@ -15,6 +16,26 @@ const csomagok = await Promise.all(
 
 const katalogus = url('/dan-first/dan-first-katalogus.pdf');
 const kezdoAr = csomagok[0]?.c.data.ar;
+
+// A csomagok termékként a keresőknek és az AI-knak, a tartalomban megadott árral.
+const oldalUrl = new URL(url('/dan-first/'), Astro.site).href;
+const termekek = await Promise.all(
+  csomagok.map(async ({ c }) => ({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: `DAN FIRST ${c.data.nev}`,
+    description: `DAN FIRST ${c.data.nev} konyhacsomag (${c.data.alcim}) bútorral, Beko gépekkel és kiegészítőkkel.`,
+    image: new URL((await getImage({ src: c.data.kep, width: 1200, format: 'jpg' })).src, Astro.site).href,
+    brand: { '@type': 'Brand', name: 'DANKÜCHEN' },
+    offers: {
+      '@type': 'Offer',
+      price: forintAr(c.data.ar),
+      priceCurrency: 'HUF',
+      url: oldalUrl,
+      seller: { '@id': STUDIO_ID(new URL(url('/'), Astro.site).href) },
+    },
+  })),
+);
 
 // A DAN FIRST katalógus „Miért a DAN FIRST?” oldala alapján
 const elonyok = [
@@ -91,8 +112,9 @@ const frontszinek = [
 
 <Layout
   title="DAN FIRST"
-  description="DAN FIRST: a DANKÜCHEN komplett konyhacsomagja bútorral, Beko gépekkel és kiegészítőkkel, 3 hetes expressz gyártással. Urban Line, Cozy Chic és Family Concept a kaposvári exkluzív stúdióban."
+  description="DAN FIRST konyhacsomag bútorral, Beko gépekkel és kiegészítőkkel, 3 hetes expressz gyártással: Urban Line, Cozy Chic és Family Concept, Kaposváron."
   aktiv="dan-first"
+  strukturalt={termekek}
 >
   <section class="szekcio--panna">
     <div class="tarolo fej">

@@ -1,0 +1,51 @@
+---
+import { url } from '../utils/url';
+import Layout from '../layouts/Layout.astro';
+
+const linkek = [
+  { cim: 'Főoldal', href: url('/') },
+  { cim: 'Konyhák', href: url('/konyhak/') },
+  { cim: 'DAN FIRST', href: url('/dan-first/') },
+  { cim: 'Kapcsolat', href: url('/kapcsolat/') },
+];
+---
+
+<Layout title="Az oldal nem található" description="Ez az oldal nem található a DANKÜCHEN Kaposvár weboldalán." noindex>
+  <section class="szekcio">
+    <div class="tarolo nincs">
+      <h1>Ez az oldal nem található</h1>
+      <p class="bevezeto">Lehet, hogy elírtad a címet, vagy az oldal közben megszűnt.</p>
+      <ul>
+        {
+          linkek.map((l) => (
+            <li>
+              <a href={l.href} class="link-nyil">
+                {l.cim} →
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a href={url('/idopontfoglalas/')} class="gomb gomb--fo">Időpontot foglalok</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .nincs {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: flex-start;
+    min-height: 40vh;
+    justify-content: center;
+  }
+  .nincs ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 32px;
+  }
+</style>
