@@ -75,6 +75,8 @@ export function uzletAdat({ honlap, kep, logo }: { honlap: string; kep: string; 
     logo,
     brand: { '@type': 'Brand', name: 'DANKÜCHEN' },
     parentOrganization: { '@type': 'Organization', name: studio.uzemelteto },
+    // A stúdió közösségi oldalai: a keresők és az AI-k ebből tudják, hogy ugyanarról a szereplőről van szó.
+    sameAs: studio.kozossegi.map((k) => k.url),
   };
 }
 

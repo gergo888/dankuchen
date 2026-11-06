@@ -51,6 +51,27 @@ const tel = nemzetkoziTelefon();
       <span>© {ev} {studio.uzemelteto} · Cg. {studio.cegjegyzekszam} · Adószám: {studio.adoszam}</span>
        -->
       <span>© {ev} {studio.uzemelteto}</span>
+      <ul class="lablec__kozossegi">
+        {
+          studio.kozossegi.map((k) => (
+            <li>
+              <a href={k.url} aria-label={k.nev}>
+                {/* Feather Icons (MIT) */}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  {k.nev === 'Facebook' && <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />}
+                  {k.nev === 'Instagram' && (
+                    <>
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                    </>
+                  )}
+                </svg>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </div>
 </footer>
@@ -113,10 +134,46 @@ const tel = nemzetkoziTelefon();
   .lablec__racs img {
     width: 128px;
   }
+  /* Balra a copyright, jobbra a közösségi ikonok, egy sorban. */
   .lablec__jogi {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
     border-top: 1px solid #cfc7bc;
     padding-block: 20px 32px;
     font-size: 0.8125rem;
     color: var(--szoveg-halvany);
+  }
+  .lablec__kozossegi {
+    display: flex;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lablec__kozossegi a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    color: var(--szoveg);
+    transition:
+      background-color 0.15s,
+      color 0.15s,
+      border-color 0.15s;
+  }
+  .lablec__kozossegi a:hover {
+    background: var(--tamarillo);
+    border-color: var(--tamarillo);
+    color: var(--feher);
+  }
+  .lablec__kozossegi svg {
+    width: 20px;
+    height: 20px;
   }
 </style>

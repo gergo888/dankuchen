@@ -22,6 +22,7 @@ export const GET: APIRoute = async ({ site }) => {
     `- Telefon: ${studio.telefon}`,
     `- E-mail: ${studio.email}`,
     `- Üzemelteti: ${studio.uzemelteto}`,
+    `- Közösségi oldalak: ${studio.kozossegi.map((k) => `[${k.nev}](${k.url})`).join(', ')}`,
     `- Szolgáltatások: ${szolgaltatasok.map((s) => s.data.cim.toLowerCase()).join(', ')}`,
     '',
     '## Oldalak',

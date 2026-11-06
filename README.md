@@ -129,7 +129,7 @@ A szövegek és képek md fájlokban vannak, kód nélkül szerkeszthetők:
 - `frontend/src/content/dan-first/*.md` – DAN FIRST csomagok (Urban Line, Cozy Chic, Family Concept): név, elrendezés, ár, képek, bútor- és géplista. A minden csomagban közös tételek, az előnyök és a frontszínek a `frontend/src/pages/dan-first.astro` elején vannak.
 - `frontend/public/dan-first/dan-first-katalogus.pdf` – a letölthető DAN FIRST katalógus (új katalógusnál ugyanezzel a névvel kell felülírni)
 - `frontend/src/content/szovegek/lamello.md` – Lamelló bemutatkozás
-- `shared/studio.json` – cím, nyitvatartás, telefon, e-mail, kapcsolattartó, cégadatok, „Mit hozz magaddal?” lista (az oldal és a visszaigazoló levél is használja)
+- `shared/studio.json` – cím, nyitvatartás, telefon, e-mail, közösségi oldalak (a lábléc ikonjai), kapcsolattartó, cégadatok, „Mit hozz magaddal?” lista (az oldal és a visszaigazoló levél is használja)
 - `backend/foglalas.json` – az időpontfoglalás minden beállítása (lásd lent)
 - `frontend/src/assets/` – képek és logók (az Astro build közben webre optimalizálja őket)
 
@@ -168,7 +168,7 @@ A `@font-face` szabályok és a fontok előtöltése (`<link rel="preload">`) a 
 
 Minden ezekhez szükséges adat a meglévő forrásokból készül a build közben, külön karbantartást nem igényel:
 
-- **Strukturált adat (JSON-LD):** minden oldalon a stúdió helyi üzletként (`FurnitureStore`) a `shared/studio.json` adataiból: név, cím, telefon, e-mail, nyitvatartás. A DAN FIRST oldalon a csomagok termékként, a tartalomban megadott árral. A címet, a nyitvatartást, a telefonszámot és az árat a `frontend/src/utils/studio.ts` bontja fel. Ha valamelyik formátuma megváltozik (pl. `"Hétfő–péntek"`, `"8:00–16:00"`, `"2.399.000 Ft"`), a build hibával leáll, és megmondja, melyik mezővel van gond.
+- **Strukturált adat (JSON-LD):** minden oldalon a stúdió helyi üzletként (`FurnitureStore`) a `shared/studio.json` adataiból: név, cím, telefon, e-mail, nyitvatartás, közösségi oldalak (`sameAs`). A DAN FIRST oldalon a csomagok termékként, a tartalomban megadott árral. A címet, a nyitvatartást, a telefonszámot és az árat a `frontend/src/utils/studio.ts` bontja fel. Ha valamelyik formátuma megváltozik (pl. `"Hétfő–péntek"`, `"8:00–16:00"`, `"2.399.000 Ft"`), a build hibával leáll, és megmondja, melyik mezővel van gond.
 - **Link előnézete** (Facebook, Messenger, Viber, e-mail): az `og:` adatok a `Layout.astro` fájlban vannak. A kép alapértelmezésben a főoldal hero képe, egy oldal a `kep` és a `kepLeiras` paraméterrel adhat sajátot.
 - **`robots.txt`:** minden robot, az AI-keresőké is, olvashatja az oldalt, csak az `/api/` tiltott.
 - **`sitemap-index.xml`:** a köszönőoldal és a 404-es oldal nélkül. Ezeken `noindex` van.
