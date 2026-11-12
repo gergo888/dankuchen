@@ -50,7 +50,7 @@ const tel = nemzetkoziTelefon();
       <!--
       <span>© {ev} {studio.uzemelteto} · Cg. {studio.cegjegyzekszam} · Adószám: {studio.adoszam}</span>
        -->
-      <span>© {ev} {studio.uzemelteto}</span>
+      <span>© {ev} {studio.uzemelteto} · <a href={url('/adatkezeles/')}>Adatkezelési tájékoztató</a></span>
       <ul class="lablec__kozossegi">
         {
           studio.kozossegi.map((k) => (
@@ -137,7 +137,8 @@ const tel = nemzetkoziTelefon();
   /* Balra a copyright, jobbra a közösségi ikonok, egy sorban. */
   .lablec__jogi {
     display: flex;
-    flex-wrap: wrap;
+    /* Keskeny kijelzőn a szöveg törik, az ikonok jobbra maradnak. */
+    flex-wrap: nowrap;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
@@ -146,7 +147,12 @@ const tel = nemzetkoziTelefon();
     font-size: 0.8125rem;
     color: var(--szoveg-halvany);
   }
+  .lablec__jogi span a {
+    color: inherit;
+    white-space: nowrap;
+  }
   .lablec__kozossegi {
+    flex: none;
     display: flex;
     gap: 12px;
     margin: 0;
