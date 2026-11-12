@@ -41,9 +41,10 @@ const tel = nemzetkoziTelefon();
         <p><a href={url('/idopontfoglalas/')}>Időpontfoglalás</a></p>
       </nav>
       <div>
-        
-        <Image src={lamelloLogo} alt="Lamelló" width={128} />
-        
+        <a href="https://www.lamello.hu/" class="lablec__lamello" target="_blank" rel="noopener">
+          <Image src={lamelloLogo} alt="Lamelló" width={128} />
+          <span class="sr-only">(új lapon nyílik)</span>
+        </a>
       </div>
     </div>
     <div class="tarolo lablec__jogi">
@@ -133,6 +134,10 @@ const tel = nemzetkoziTelefon();
   }
   .lablec__racs img {
     width: 128px;
+  }
+  /* Csak a logó legyen kattintható, ne az egész oszlop szélessége. */
+  .lablec__lamello {
+    align-self: flex-start;
   }
   /* Balra a copyright, jobbra a közösségi ikonok, egy sorban. */
   .lablec__jogi {
