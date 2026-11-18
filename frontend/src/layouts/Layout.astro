@@ -8,7 +8,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SutiBanner from '../components/SutiBanner.astro';
-import { GTM_CIM, hozzajarulasSzkript } from '../utils/google';
+import { gtmSzkript } from '../utils/google';
 import fontCim from '../assets/fonts/Gazpacho-MediumItalic.woff2?url';
 import fontSzoveg from '../assets/fonts/GT-Walsheim-Regular.woff2?url';
 import alapKep from '../assets/konyhak/silbermond/silbermond-eiche-nordic-anthrazit.jpg';
@@ -69,15 +69,8 @@ const fontFace = `
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Consent Mode alapértéke, a GTM előtt (utils/google.ts) -->
-    <script is:inline set:html={hozzajarulasSzkript()} />
-    <!-- Google Tag Manager: a tároló telepítőkódja betűre, ahogy a GTM adja -->
-    <script is:inline async src={GTM_CIM}></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    </script>
+    <!-- Google Tag Manager a Consent Mode alapértékével; a gtm.js az oldal betöltése után jön (utils/google.ts) -->
+    <script is:inline set:html={gtmSzkript()} />
     <!-- WebMCP: az időpontfoglalás eszközei az AI-agenteknek (utils/webmcp.ts) -->
     <meta http-equiv="origin-trial" content={WEBMCP_ORIGIN_TRIAL} />
     <title>{teljesCim}</title>

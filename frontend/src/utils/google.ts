@@ -11,13 +11,13 @@ export const HOZZAJARULAS_KULCS = 'dankuchen-suti';
 export const HOZZAJARULAS_VERZIO = 1;
 export const HOZZAJARULAS_ERVENYES_NAP = 365;
 
-// A GTM 2026-os telepítőkódja: közvetlen <script async src> és gtag('js'), <noscript> iframe nélkül
-// (Layout.astro). A Google „Test your website” ellenőrzője ezt a címet keresi a HTML-ben.
-export const GTM_CIM = `https://www.googletagmanager.com/gtm.js?id=${GTM_AZONOSITO}`;
-
-// A <head> elejére, a GTM telepítőkódja elé kerülő szkript. Sorrend a dokumentáció szerint:
-// alapérték (minden tiltva), majd a tárolt választás visszaállítása, mindkettő a GTM betöltése előtt.
-export const hozzajarulasSzkript = () => `
+// A GTM 2026-os telepítőkódja (gtag('js') és a gtm.js?id= cím), egyetlen szkriptben a hozzájárulással.
+// Sorrend a dokumentáció szerint: alapérték (minden tiltva), a tárolt választás visszaállítása, a GTM indítása.
+//
+// A gtm.js (kb. 200 KB) csak az oldal betöltése után, üresjáratban töltődik be, hogy ne versenyezzen a
+// betűtípusokkal és a nyitóképpel, és ne futhasson az első megjelenítés előtt. A gtag('js') időbélyege a
+// valódi oldalbetöltést jelzi, a GTM a már lezajlott DOM Ready és Window Loaded eseményeket is lefuttatja.
+export const gtmSzkript = () => `
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied' });
@@ -29,4 +29,19 @@ try {
     gtag('consent', 'update', { analytics_storage: s, ad_storage: m, ad_user_data: m, ad_personalization: m });
   }
 } catch (e) {}
+gtag('js', new Date());
+(function () {
+  function gtm() {
+    var j = document.createElement('script');
+    j.async = true;
+    j.src = 'https://www.googletagmanager.com/gtm.js?id=${GTM_AZONOSITO}';
+    document.head.appendChild(j);
+  }
+  function utana() {
+    if ('requestIdleCallback' in window) requestIdleCallback(gtm, { timeout: 2000 });
+    else setTimeout(gtm, 1);
+  }
+  if (document.readyState === 'complete') utana();
+  else addEventListener('load', utana, { once: true });
+})();
 `;
