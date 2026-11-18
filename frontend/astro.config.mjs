@@ -11,6 +11,9 @@ export default defineConfig({
   base: process.env.BASE_PATH || '/',
   // A kevés CSS a HTML-be kerül, így az oldal kirajzolása nem vár külön letöltésre.
   build: { inlineStylesheets: 'always' },
+  // A fejlesztői szerver csak helyben figyel. A cím rögzített, mert a VPS-en a „localhost” az IPv6-os ::1-re
+  // oldódik fel, és akkor az SSH-alagút (127.0.0.1:4321) nem érné el. Lásd: README, Fejlesztés a VPS-en.
+  server: { host: '127.0.0.1', port: 4321 },
   vite: {
     server: {
       // A foglalási API és az admin felület külön alkalmazás (backend/), fejlesztéskor ide kerülnek a kérései.

@@ -8,12 +8,40 @@ Node.js 22.23.4 vagy újabb kell (`.nvmrc`: 24). A parancsok a repó gyökeréb�
 
 ```sh
 npm run setup    # függőségek telepítése mindkét alkalmazásban
-npm run dev      # backend (4322-es port) és frontend (http://localhost:4321) együtt, a Ctrl+C mindkettőt leállítja
+npm run dev      # backend (127.0.0.1:4322) és frontend (http://localhost:4321) együtt, a Ctrl+C mindkettőt leállítja
 npm run build    # a frontend buildje a frontend/dist/ mappába
 npm test         # a backend tesztjei: foglalási szabályok, API, admin felület, beállítások
 ```
 
-Az admin felület fejlesztéskor a http://localhost:4321/admin/ címen érhető el. Előtte próbajelszó kell: a `node backend/admin-jelszo.ts --kiir` kiírja a két sort, ezeket a gitből kizárt `backend/.env` fájlba kell másolni, és az `npm run dev` beolvassa.
+Az admin felület fejlesztéskor a http://localhost:4321/admin/ címen érhető el. Előtte próbajelszó kell: a `node backend/admin-jelszo.ts --kiir` kiírja a két sort, ezeket a gitből kizárt `backend/.env` fájlba kell másolni, és az `npm run dev` beolvassa (módosítás után újra kell indítani).
+
+A fejlesztői szerverek csak helyben figyelnek (127.0.0.1). Az éles foglalási API a szerveren a 4330-as porton fut, így a 4321 és a 4322 a fejlesztésé.
+
+### Fejlesztés a VPS-en
+
+A repó a szerveren is megvan: `/home/ubuntu/dankuchen`, az `ubuntu` felhasználóé. Ott ugyanúgy `npm run dev` indítja a két fejlesztői szervert (érdemes `tmux`-ban, hogy a kapcsolat bontása után is fusson), a saját gépről pedig SSH-alagúton érhetők el:
+
+```sh
+ssh -p 2222 -N -L 4321:127.0.0.1:4321 -L 4322:127.0.0.1:4322 ubuntu@fabutorwebaruhaz.hu
+```
+
+Vagy a saját gép `~/.ssh/config` fájljába, utána elég az `ssh -N dankuchen-dev`:
+
+```
+Host dankuchen-dev
+    HostName fabutorwebaruhaz.hu
+    Port 2222
+    User ubuntu
+    LocalForward 4321 127.0.0.1:4321
+    LocalForward 4322 127.0.0.1:4322
+```
+
+Amíg az alagút él, a saját gépen a http://localhost:4321 az oldal, a http://localhost:4321/admin/ az admin, a http://localhost:4322/api/szabad-idopontok a backend.
+
+- **Fejlesztői adatok:** az adatbázis a gitből kizárt `backend/data/foglalasok.db`, külön az élestől. A `/etc/dankuchen/dankuchen.env` tartalmát (SMTP-jelszó, éles adatbázis) soha nem szabad a `backend/.env`-be másolni, mert akkor a fejlesztés éles leveleket küldene, vagy az éles adatbázisba írna.
+- **Pusholás a szerverről:** az `ubuntu` felhasználó SSH-kulcsát fel kell venni a GitHubra, a távoli címet pedig SSH-ra állítani: `git remote set-url origin git@github.com:gergo888/dankuchen.git`.
+- **Két munkapéldány:** ha a saját gépen is van klón, munka előtt mindig `git pull`, hogy a két példány ne ágazzon el.
+- **Build a szerveren:** a frontend buildje a képek miatt egy-két percig terheli a processzort, amin a webáruház is fut.
 
 ## Oldalak
 
@@ -48,8 +76,8 @@ Böngésző
    ▼
 Apache (443-as port, dankuchenkaposvar.hu)
    ├─ /...        → /var/www/dankuchen      statikus oldalak (frontend)
-   ├─ /api/...    → Node, 127.0.0.1:4322    szabad órák, foglalás (backend)
-   └─ /admin/...  → Node, 127.0.0.1:4322    admin felület, belépéssel (backend)
+   ├─ /api/...    → Node, 127.0.0.1:4330    szabad órák, foglalás (backend)
+   └─ /admin/...  → Node, 127.0.0.1:4330    admin felület, belépéssel (backend)
                        ├─ SQLite fájl       /var/lib/dankuchen/foglalasok.db
                        └─ SMTP              mail.fws.hu:587 (e-mailek)
 ```
@@ -253,7 +281,7 @@ A `backend/foglalas.json` a levélküldés technikai beállításait tartalmazza
 
 ## Telepítés
 
-A telepítés a saját gépről, a repóból indul. A két alkalmazás külön is telepíthető:
+A telepítés a repóból indul, a saját gépről vagy a szerveren lévő példányból (`/home/ubuntu/dankuchen`). A `deploy/telepit.sh` maga ismeri fel, hol fut: a szerveren helyben másol és indít újra (`sudo`-val, az `ubuntu` felhasználó jelszó nélkül használhatja), máshol SSH-n át (`root@fabutorwebaruhaz.hu`, 2222-es port). Induláskor kiírja, melyik módban fut. A két alkalmazás külön is telepíthető:
 
 ```sh
 deploy/telepit.sh            # mindkettő
@@ -298,7 +326,7 @@ A `deploy/` mappa többi fájlja egyszeri szerverbeállításhoz kell, a `telepi
 | Szolgáltatás | Szerepe | Ha leáll |
 |---|---|---|
 | `apache2` | Kiszolgálja az oldalt, és továbbítja az API-kéréseket | Az oldal és a webáruház sem érhető el |
-| `dankuchen` | Node-folyamat a `127.0.0.1:4322` címen, a foglalási API és az admin felület | Az oldal működik, de nem lehet foglalni: hibaüzenet és telefonszám jelenik meg. Az admin sem érhető el |
+| `dankuchen` | Node-folyamat a `127.0.0.1:4330` címen, a foglalási API és az admin felület | Az oldal működik, de nem lehet foglalni: hibaüzenet és telefonszám jelenik meg. Az admin sem érhető el |
 | `dankuchen-mentes.timer` | Elindítja a napi mentést | Minden működik, de nem készül új mentés |
 
 MySQL és PHP nem kell. Az SQLite nem külön szolgáltatás, hanem egy fájl, amelyet a Node-folyamat kezel.
@@ -326,7 +354,7 @@ node /opt/dankuchen/backend/admin-jelszo.ts                     # az admin felha
 
 A `foglalas.json` a szerveren is megvan (`/opt/dankuchen/backend/foglalas.json`), sürgős esetben ott is átírható, és a `systemctl restart dankuchen` után érvényes. Ilyenkor nem fut le a teszt, így hibás JSON-nal a szolgáltatás nem indul el (`journalctl -u dankuchen` mutatja az okot), a következő telepítés pedig felülírja, ezért a változást a repóba is be kell vezetni.
 
-A port módosításához az Apache-szabályt és a `deploy/telepit.sh` ellenőrző hívását is át kell írni.
+A port módosításához a `dankuchen.service` mellett az Apache-szabályokat (`/api/` és `/admin/`) és a `deploy/telepit.sh` `ELES_PORT` változóját is át kell írni. A 4321 és a 4322 a fejlesztői szervereké, élesen ne ezek legyenek.
 
 ### Egyszeri szerverbeállítás
 
