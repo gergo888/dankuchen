@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { createServer } from 'node:http';
 import type { IncomingMessage } from 'node:http';
 import { pathToFileURL } from 'node:url';
@@ -78,6 +79,10 @@ export function szerverLetrehozasa() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  // Fejlesztéskor a backend/.env fájlból jönnek a helyi beállítások (pl. az admin próbajelszava), ha van ilyen.
+  // A szerveren a systemd adja át őket (NODE_ENV=production), ott ez nem fut le. A Node --env-file-if-exists
+  // kapcsolója --watch mellett hiányzó fájlnál összeomlik, ezért itt töltődik be. A .env módosítása után újra kell indítani.
+  if (process.env.NODE_ENV !== 'production' && existsSync('.env')) process.loadEnvFile('.env');
   const host = process.env.HOST ?? '127.0.0.1';
   const port = Number(process.env.PORT ?? 4322);
   szerverLetrehozasa().listen(port, host, () => console.log(`A foglalási API fut: http://${host}:${port}`));
