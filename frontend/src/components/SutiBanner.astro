@@ -1,0 +1,197 @@
+---
+// Sütihozzájárulás: Google Consent Mode v2 (a beállítások és az alapérték: utils/google.ts, Layout.astro <head>).
+// Csak akkor jelenik meg, ha nincs érvényes tárolt választás. A lábléc „Süti-beállítások” gombja újranyitja.
+import { HOZZAJARULAS_ERVENYES_NAP, HOZZAJARULAS_KULCS, HOZZAJARULAS_VERZIO } from '../utils/google';
+---
+
+<section class="suti" aria-labelledby="suti-cim" hidden data-kulcs={HOZZAJARULAS_KULCS} data-verzio={HOZZAJARULAS_VERZIO} data-napok={HOZZAJARULAS_ERVENYES_NAP}>
+  <div class="tarolo suti__doboz">
+    <h2 id="suti-cim" class="suti__cim" tabindex="-1">Sütik és mérés</h2>
+    <p class="suti__szoveg">
+      A böngészési élmény fokozása, a személyre szabott hirdetések vagy tartalmak megjelenítése, valamint a forgalom elemzése érdekében sütiket (cookie) használunk. A „Mindet elfogadom” gombra kattintva hozzájárulhat a sütik használatához.
+    </p>
+    <fieldset class="suti__kategoriak" hidden>
+      <legend class="sr-only">Sütikategóriák</legend>
+      <label><input type="checkbox" checked disabled /> <span><strong>Szükséges</strong> – a választásod tárolása, mindig aktív</span></label>
+      <label><input type="checkbox" name="statisztika" /> <span><strong>Statisztika</strong> – Google Analytics: a látogatottság mérése</span></label>
+      <label><input type="checkbox" name="marketing" /> <span><strong>Marketing</strong> – Google Ads: a hirdetések eredményességének mérése</span></label>
+    </fieldset>
+    <div class="suti__gombok">
+      <button type="button" class="gomb suti__gomb" data-suti="elfogad">Mindet elfogadom</button>
+      <button type="button" class="gomb suti__gomb" data-suti="elutasit">Elutasítom</button>
+      <button type="button" class="gomb suti__gomb suti__gomb--masodlagos" data-suti="beallitasok">Beállítások</button>
+      <button type="button" class="gomb suti__gomb" data-suti="mentes" hidden>Kiválasztottak mentése</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  type Valasztas = { statisztika: boolean; marketing: boolean };
+  type Gtag = (...args: unknown[]) => void;
+
+  const banner = document.querySelector<HTMLElement>('.suti')!;
+  const cim = banner.querySelector<HTMLElement>('.suti__cim')!;
+  const kategoriak = banner.querySelector<HTMLFieldSetElement>('.suti__kategoriak')!;
+  const statisztika = kategoriak.querySelector<HTMLInputElement>('[name="statisztika"]')!;
+  const marketing = kategoriak.querySelector<HTMLInputElement>('[name="marketing"]')!;
+  const gomb = (nev: string) => banner.querySelector<HTMLButtonElement>(`[data-suti="${nev}"]`)!;
+  const KULCS = banner.dataset.kulcs!;
+  const VERZIO = Number(banner.dataset.verzio);
+  const NAPOK = Number(banner.dataset.napok);
+  let visszaFokusz: HTMLElement | null = null;
+
+  function tarolt(): Valasztas | null {
+    try {
+      const v = JSON.parse(localStorage.getItem(KULCS) ?? 'null');
+      if (v && v.verzio === VERZIO && Date.now() - v.ido < NAPOK * 864e5) return { statisztika: Boolean(v.statisztika), marketing: Boolean(v.marketing) };
+    } catch {
+      // A tárhely nem érhető el (pl. tiltott sütik): a banner minden oldalon újra megjelenik.
+    }
+    return null;
+  }
+
+  // A visszavont kategória már elhelyezett sütijei is törlődnek (a GA4 a fő domainre teszi őket).
+  function sutikTorlese(minta: RegExp) {
+    const domainek = ['', location.hostname, `.${location.hostname.replace(/^www\./, '')}`];
+    for (const suti of document.cookie.split(';')) {
+      const nev = suti.split('=')[0].trim();
+      if (!minta.test(nev)) continue;
+      for (const domain of domainek) document.cookie = `${nev}=; Max-Age=0; path=/${domain ? `; domain=${domain}` : ''}`;
+    }
+  }
+
+  function ment(v: Valasztas) {
+    try {
+      localStorage.setItem(KULCS, JSON.stringify({ ...v, verzio: VERZIO, ido: Date.now() }));
+    } catch {
+      // Tárolás nélkül is érvényes az adott oldalon.
+    }
+    const s = v.statisztika ? 'granted' : 'denied';
+    const m = v.marketing ? 'granted' : 'denied';
+    (window as unknown as { gtag?: Gtag }).gtag?.('consent', 'update', { analytics_storage: s, ad_storage: m, ad_user_data: m, ad_personalization: m });
+    if (!v.statisztika) sutikTorlese(/^_ga(_|$)/);
+    if (!v.marketing) sutikTorlese(/^_gcl_/);
+    bezar();
+  }
+
+  function beallitasokMutatasa(mutat: boolean) {
+    kategoriak.hidden = !mutat;
+    gomb('beallitasok').hidden = mutat;
+    gomb('mentes').hidden = !mutat;
+  }
+
+  function nyit(kezzel: boolean) {
+    const v = tarolt();
+    statisztika.checked = v?.statisztika ?? false;
+    marketing.checked = v?.marketing ?? false;
+    beallitasokMutatasa(kezzel);
+    banner.hidden = false;
+    if (kezzel) {
+      visszaFokusz = document.activeElement as HTMLElement | null;
+      cim.focus();
+    }
+  }
+
+  function bezar() {
+    banner.hidden = true;
+    visszaFokusz?.focus();
+    visszaFokusz = null;
+  }
+
+  gomb('elfogad').addEventListener('click', () => ment({ statisztika: true, marketing: true }));
+  gomb('elutasit').addEventListener('click', () => ment({ statisztika: false, marketing: false }));
+  gomb('beallitasok').addEventListener('click', () => {
+    beallitasokMutatasa(true);
+    statisztika.focus();
+  });
+  gomb('mentes').addEventListener('click', () => ment({ statisztika: statisztika.checked, marketing: marketing.checked }));
+  document.querySelectorAll('[data-suti-nyit]').forEach((g) => g.addEventListener('click', () => nyit(true)));
+
+  if (!tarolt()) nyit(false);
+</script>
+
+<style>
+  /* A saját display szabályok (grid, inline-flex) ne írják felül a hidden attribútumot. */
+  .suti [hidden] {
+    display: none !important;
+  }
+  .suti {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 100;
+    background: var(--feher);
+    border-top: 1px solid var(--vonal);
+    box-shadow: 0 -8px 24px rgb(0 0 0 / 12%);
+  }
+  .suti__doboz {
+    display: grid;
+    gap: 12px;
+    padding-block: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  .suti__cim {
+    font-family: var(--font-szoveg);
+    font-style: normal;
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+  .suti__cim:focus {
+    outline: none;
+  }
+  .suti__szoveg {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    max-width: 72rem;
+  }
+  .suti__kategoriak {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 0.9375rem;
+  }
+  .suti__kategoriak label {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .suti__kategoriak input {
+    width: 20px;
+    height: 20px;
+    margin: 1px 0 0;
+    flex: none;
+  }
+  .suti__gombok {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  /* Az elfogadás és az elutasítás egyformán hangsúlyos. A DAN piros a fő foglalás gombé marad. */
+  .suti__gomb {
+    min-height: 44px;
+    padding: 0 24px;
+    background: var(--fekete);
+    color: var(--feher);
+  }
+  .suti__gomb:hover {
+    background: var(--szoveg-halvany);
+  }
+  .suti__gomb--masodlagos {
+    background: transparent;
+    color: var(--fekete);
+    border-color: currentColor;
+    font-weight: 500;
+  }
+  .suti__gomb--masodlagos:hover {
+    background: var(--panna);
+  }
+  /* Mobilon az elfogadás és az elutasítás egy sorban, fele-fele szélességben, a többi alattuk. */
+  @media (max-width: 520px) {
+    .suti__gomb {
+      flex: 1 1 40%;
+      padding: 0 12px;
+    }
+  }
+</style>

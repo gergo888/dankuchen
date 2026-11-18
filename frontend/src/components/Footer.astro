@@ -51,7 +51,10 @@ const tel = nemzetkoziTelefon();
       <!--
       <span>© {ev} {studio.uzemelteto} · Cg. {studio.cegjegyzekszam} · Adószám: {studio.adoszam}</span>
        -->
-      <span>© {ev} {studio.uzemelteto} · <a href={url('/adatkezeles/')}>Adatkezelési tájékoztató</a></span>
+      <span
+        >© {ev} {studio.uzemelteto} · <a href={url('/adatkezeles/')}>Adatkezelési tájékoztató</a> ·{' '}
+        <button type="button" class="lablec__suti" data-suti-nyit>Süti-beállítások</button></span
+      >
       <ul class="lablec__kozossegi">
         {
           studio.kozossegi.map((k) => (
@@ -155,6 +158,17 @@ const tel = nemzetkoziTelefon();
   .lablec__jogi span a {
     color: inherit;
     white-space: nowrap;
+  }
+  /* A sütibeállítások gombja linknek látszik (SutiBanner.astro nyitja meg). */
+  .lablec__suti {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-decoration: underline;
+    white-space: nowrap;
+    cursor: pointer;
   }
   .lablec__kozossegi {
     flex: none;

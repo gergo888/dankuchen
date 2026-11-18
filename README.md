@@ -189,6 +189,16 @@ Az eszközök ugyanazt a beküldést és ugyanazt a backendet használják, mint
 
 **Kipróbálás:** helyben a Chrome-ot a `chrome://flags/#enable-webmcp-testing` kapcsolóval vagy az `--enable-experimental-web-platform-features` indítási kapcsolóval kell futtatni. Ezután a konzolban a `document.modelContext.getTools()` hívás mutatja az eszközöket. Valódi agenttel a [Model Context Tool Inspector](https://chromewebstore.google.com/detail/model-context-tool-inspec/gbpdfapgefenggkahomfgkhfehlcenpd) bővítmény a legegyszerűbb, ehhez Gemini API-kulcs kell. Élesben a foglalás valódi leveleket küld.
 
+## Google Tag Manager és sütihozzájárulás
+
+Az oldalon Google Tag Manager fut (`GTM-PCN2CJD3`, benne a GA4-mérés Google Ads-összekapcsolással), a [Google Consent Mode](https://developers.google.com/tag-platform/security/guides/consent?consentmode=advanced) haladó módjában:
+
+- **Alapérték:** a `Layout.astro` `<head>` részének elején minden hozzájárulási típus `denied`. Hozzájárulás nélkül a Google csak sütik nélküli jelzéseket kap. Utána jön a tárolt választás visszaállítása, és csak ezután a GTM betöltése (`frontend/src/utils/google.ts`).
+- **Banner:** `frontend/src/components/SutiBanner.astro`. Két kategóriát kezel: statisztika (`analytics_storage`) és marketing (`ad_storage`, `ad_user_data`, `ad_personalization`). A választás a böngésző helyi tárhelyén van (`dankuchen-suti`), 12 hónapig. A lábléc „Süti-beállítások” gombja újranyitja. Visszavonáskor a `_ga*` és `_gcl_*` sütik törlődnek.
+- **Újrakérdezés:** ha a tárolóba új kategóriát igénylő címke kerül, vagy az adatkezelési tájékoztató lényegesen változik, a `HOZZAJARULAS_VERZIO` növelésével mindenkitől újra hozzájárulást kér.
+- **Más címke a tárolóban:** ha nem Google-címke kerül a GTM-tárolóba (pl. Meta Pixel), annak a GTM-ben külön hozzájárulási feltételt kell beállítani, és fel kell venni az adatkezelési tájékoztatóba.
+- **Kipróbálás:** a böngésző konzoljában a `localStorage.removeItem('dankuchen-suti')` törli a választást, újratöltés után a banner újra megjelenik.
+
 ## Időpontfoglaló rendszer
 
 A frontend statikus, a foglalást a külön futó backend intézi (`backend/`). A foglalások SQLite-ban vannak, a dupla foglalást az adatbázis egyedi indexe zárja ki. A látogató csak a szabad órákat kapja meg, és a szerver minden beküldésnél újra ellenőrzi az időpontot. Admin felület nincs, minden beállítás a `backend/foglalas.json` fájlban van.
