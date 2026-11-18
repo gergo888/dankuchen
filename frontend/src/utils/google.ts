@@ -14,9 +14,12 @@ export const HOZZAJARULAS_ERVENYES_NAP = 365;
 // A GTM 2026-os telepítőkódja (gtag('js') és a gtm.js?id= cím), egyetlen szkriptben a hozzájárulással.
 // Sorrend a dokumentáció szerint: alapérték (minden tiltva), a tárolt választás visszaállítása, a GTM indítása.
 //
-// A gtm.js (kb. 200 KB) csak az oldal betöltése után, üresjáratban töltődik be, hogy ne versenyezzen a
-// betűtípusokkal és a nyitóképpel, és ne futhasson az első megjelenítés előtt. A gtag('js') időbélyege a
-// valódi oldalbetöltést jelzi, a GTM a már lezajlott DOM Ready és Window Loaded eseményeket is lefuttatja.
+// A gtm.js (kb. 200 KB) csak akkor töltődik be, ha az oldal betöltődött (load) ÉS a fő tartalom (LCP,
+// a nyitókép) kirajzolódott, utána üresjáratban. Így nem versenyez a betűtípusokkal és a nyitóképpel,
+// és a PageSpeed szimulációja sem számolja bele az LCP-be (a mobil tesztgépen az oldal csak ~2,4 s-nál
+// jelenik meg, a load után induló GTM korábban ebbe belecsúszhatott). Ahol a böngésző nem jelzi az LCP-t,
+// vagy a lap háttérben nyílt meg, a load után 5 s-mal indul. A gtag('js') időbélyege a valódi
+// oldalbetöltést jelzi, a GTM a már lezajlott DOM Ready és Window Loaded eseményeket is lefuttatja.
 export const gtmSzkript = () => `
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
@@ -31,17 +34,35 @@ try {
 } catch (e) {}
 gtag('js', new Date());
 (function () {
+  var betoltve = false, kirajzolva = false, utemezve = false;
   function gtm() {
     var j = document.createElement('script');
     j.async = true;
     j.src = 'https://www.googletagmanager.com/gtm.js?id=${GTM_AZONOSITO}';
     document.head.appendChild(j);
   }
-  function utana() {
+  function probal() {
+    if (!betoltve || !kirajzolva || utemezve) return;
+    utemezve = true;
     if ('requestIdleCallback' in window) requestIdleCallback(gtm, { timeout: 2000 });
     else setTimeout(gtm, 1);
   }
-  if (document.readyState === 'complete') utana();
-  else addEventListener('load', utana, { once: true });
+  function kesz() {
+    kirajzolva = true;
+    probal();
+  }
+  try {
+    if (PerformanceObserver.supportedEntryTypes.indexOf('largest-contentful-paint') < 0) throw 0;
+    new PerformanceObserver(kesz).observe({ type: 'largest-contentful-paint', buffered: true });
+  } catch (e) {
+    kirajzolva = true;
+  }
+  function utanaBetoltes() {
+    betoltve = true;
+    probal();
+    setTimeout(kesz, 5000);
+  }
+  if (document.readyState === 'complete') utanaBetoltes();
+  else addEventListener('load', utanaBetoltes, { once: true });
 })();
 `;
