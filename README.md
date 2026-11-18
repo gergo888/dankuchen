@@ -19,6 +19,8 @@ A fejlesztői szerverek csak helyben figyelnek (127.0.0.1). Az éles foglalási 
 
 ### Fejlesztés a VPS-en
 
+> **Szünetel (2026-11-18):** a VPS processzora nem tudja futtatni a képfeldolgozó `sharp` csomagot, ezért ott nem készül el a frontend buildje, és a fejlesztői szerveren sem jelennek meg a feldolgozott képek. Addig a fejlesztés és a frontend telepítése a saját gépről megy. Az állapot és az újrapróbálás lépései: [docs/vps-koltoztetes.md](docs/vps-koltoztetes.md).
+
 A repó a szerveren is megvan: `/home/ubuntu/dankuchen`, az `ubuntu` felhasználóé. Ott ugyanúgy `npm run dev` indítja a két fejlesztői szervert (érdemes `tmux`-ban, hogy a kapcsolat bontása után is fusson), a saját gépről pedig SSH-alagúton érhetők el:
 
 ```sh
@@ -281,7 +283,7 @@ A `backend/foglalas.json` a levélküldés technikai beállításait tartalmazza
 
 ## Telepítés
 
-A telepítés a repóból indul, a saját gépről vagy a szerveren lévő példányból (`/home/ubuntu/dankuchen`). A `deploy/telepit.sh` maga ismeri fel, hol fut: a szerveren helyben másol és indít újra (`sudo`-val, az `ubuntu` felhasználó jelszó nélkül használhatja), máshol SSH-n át (`root@fabutorwebaruhaz.hu`, 2222-es port). Induláskor kiírja, melyik módban fut. A két alkalmazás külön is telepíthető:
+A telepítés a repóból indul, a saját gépről vagy a szerveren lévő példányból (`/home/ubuntu/dankuchen`). A `deploy/telepit.sh` maga ismeri fel, hol fut: a szerveren helyben másol és indít újra (`sudo`-val, az `ubuntu` felhasználó jelszó nélkül használhatja), máshol SSH-n át (`root@fabutorwebaruhaz.hu`, 2222-es port). Induláskor kiírja, melyik módban fut. A frontend egyelőre csak a saját gépről telepíthető, mert a VPS-en nem készül el a buildje (lásd: [docs/vps-koltoztetes.md](docs/vps-koltoztetes.md)). A két alkalmazás külön is telepíthető:
 
 ```sh
 deploy/telepit.sh            # mindkettő
