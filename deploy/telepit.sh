@@ -36,5 +36,7 @@ if [ "$CEL" != frontend ]; then
   rsync -az --delete --chown=root:root --exclude node_modules --exclude test --exclude data --exclude '.env*' -e "$SSH_OPCIOK" backend/ "$SZERVER:$APP/backend/"
   rsync -az --delete --chown=root:root -e "$SSH_OPCIOK" shared/ "$SZERVER:$APP/shared/"
   rsync -az --chown=root:root -e "$SSH_OPCIOK" deploy/foglalasok.mjs deploy/mentes.mjs "$SZERVER:$APP/"
+  # Az újraindításkor lefuthat egy adatbázis-migráció, ezért előtte mentés készül (a napi mentések mellé).
+  $SSH_OPCIOK "$SZERVER" "runuser -u dankuchen -- env DB_PATH=/var/lib/dankuchen/foglalasok.db node --disable-warning=ExperimentalWarning $APP/mentes.mjs"
   $SSH_OPCIOK "$SZERVER" "cd $APP/backend && npm ci --omit=dev --ignore-scripts --no-audit --no-fund && systemctl restart dankuchen && sleep 2 && curl -fsS -o /dev/null http://127.0.0.1:4322/api/szabad-idopontok && echo 'A foglalási API válaszol.'"
 fi

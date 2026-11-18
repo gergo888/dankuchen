@@ -3,8 +3,15 @@ import type { FoglalasAdatok } from './db.ts';
 const szoveg = (ertek: unknown) => (typeof ertek === 'string' ? ertek.trim() : '');
 const egysoros = (s: string) => !/[\r\n\t\p{Cc}]/u.test(s);
 
+interface Beallitas {
+  // A telefonos foglalásnál az e-mail cím nem kötelező.
+  emailKotelezo?: boolean;
+  // Az adminban a stúdió rögzít, ott nincs elfogadó jelölő.
+  adatkezelesKell?: boolean;
+}
+
 // A beküldött mezők ellenőrzése. Hibás adatnál a hibás mezők nevét adja vissza.
-export function urlapEllenorzes(adat: Record<string, unknown>): { adatok: FoglalasAdatok; hibak: string[] } {
+export function urlapEllenorzes(adat: Record<string, unknown>, { emailKotelezo = true, adatkezelesKell = true }: Beallitas = {}): { adatok: FoglalasAdatok; hibak: string[] } {
   const adatok = {
     nap: szoveg(adat.nap),
     ora: szoveg(adat.ora),
@@ -17,9 +24,9 @@ export function urlapEllenorzes(adat: Record<string, unknown>): { adatok: Foglal
   const hibak: string[] = [];
   if (!adatok.nev || adatok.nev.length > 100 || !egysoros(adatok.nev)) hibak.push('nev');
   if (!/^\+?[\d\s()/-]{6,25}$/.test(adatok.telefon)) hibak.push('telefon');
-  if (adatok.email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adatok.email)) hibak.push('email');
+  if ((emailKotelezo || adatok.email) && (adatok.email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adatok.email))) hibak.push('email');
   if (adatok.telepules.length > 100 || !egysoros(adatok.telepules)) hibak.push('telepules');
   if (adatok.uzenet.length > 2000) hibak.push('uzenet');
-  if (adat.adatkezeles !== 'elfogadva') hibak.push('adatkezeles');
+  if (adatkezelesKell && adat.adatkezeles !== 'elfogadva') hibak.push('adatkezeles');
   return { adatok, hibak };
 }

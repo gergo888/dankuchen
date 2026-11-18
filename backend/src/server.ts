@@ -1,6 +1,7 @@
 import { createServer } from 'node:http';
 import type { IncomingMessage } from 'node:http';
 import { pathToFileURL } from 'node:url';
+import { adminKeres } from './admin/utvonalak.ts';
 import { foglalasBekuldese, szabadIdopontokLekerese } from './api.ts';
 import type { ApiValasz } from './api.ts';
 
@@ -51,6 +52,19 @@ async function kerestKezel(req: IncomingMessage): Promise<ApiValasz> {
 
 export function szerverLetrehozasa() {
   return createServer(async (req, res) => {
+    // Az admin felület HTML-t ad, a saját válaszait maga írja meg (admin/utvonalak.ts).
+    const utvonal = new URL(req.url ?? '/', 'http://localhost').pathname;
+    if (utvonal === '/admin' || utvonal.startsWith('/admin/')) {
+      try {
+        await adminKeres(req, res);
+      } catch (err) {
+        console.error('[admin] váratlan hiba:', err);
+        if (!res.headersSent) res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
+        res.end('Váratlan hiba történt. Próbáld újra.');
+      }
+      return;
+    }
+
     let valasz: ApiValasz;
     try {
       valasz = await kerestKezel(req);

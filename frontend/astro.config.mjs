@@ -13,8 +13,8 @@ export default defineConfig({
   build: { inlineStylesheets: 'always' },
   vite: {
     server: {
-      // A foglalási API külön alkalmazás (backend/), fejlesztéskor ide kerülnek a kérései.
-      proxy: { '/api': 'http://127.0.0.1:4322' },
+      // A foglalási API és az admin felület külön alkalmazás (backend/), fejlesztéskor ide kerülnek a kérései.
+      proxy: { '/api': 'http://127.0.0.1:4322', '/admin': 'http://127.0.0.1:4322' },
       // A böngészőben futó script a ../shared mappából importál.
       fs: { allow: ['..'] },
     },

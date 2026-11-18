@@ -55,12 +55,12 @@ Az adatkezelő nyilatkozik, hogy adatkezelése a jelen pontban foglalt alapelvek
 |---|---|---|
 | Vezeték- és keresztnév | Azonosítás, az időpont egyeztetése, kapcsolattartás. | Szerződés megkötését megelőzően az érintett kérésére történő lépések megtétele, a GDPR 6. cikk (1) bekezdés b) pontja. |
 | Telefonszám | Kapcsolattartás, az időpont egyeztetése. | |
-| E-mail cím | Kapcsolattartás, az időpont visszaigazolása. | |
+| E-mail cím | Kapcsolattartás, az időpont visszaigazolása, lemondás esetén az érintett értesítése. | |
 | Település (nem kötelező) | A látványtervezés és az esetleges helyszíni felmérés előkészítése. | |
 | Üzenet (nem kötelező) | A látványtervezés előkészítése az érintett által megadott információk alapján. | |
 | Az adatkezelési tájékoztató elfogadásának ténye, a foglalás elküldésének időpontja | Technikai művelet végrehajtása, az elfogadás igazolása. | |
 
-2. Az érintettek köre: A weboldalon az időpontfoglaló űrlapot kitöltő valamennyi érintett.
+2. Az érintettek köre: A weboldalon az időpontfoglaló űrlapot kitöltő valamennyi érintett, valamint azok, akik telefonon vagy személyesen egyeztetnek időpontot. Az utóbbiak adatait (név, telefonszám, és ha megadják, e-mail cím, település, megjegyzés) a stúdió munkatársa rögzíti ugyanebben a foglalási rendszerben, ugyanazon célból, jogalapon és időtartamra.
 3. Az adatkezelés időtartama, az adatok törlésének határideje: Az adatkezelés céljának megvalósulásáig, de legfeljebb az adatközléstől számított 2 évig, illetve az érintett törlési kérelméig tart. Az érintett által megadott bármely személyes adat törléséről az adatkezelő a GDPR 19. cikke alapján, elektronikus úton tájékoztatja az érintettet. Amennyiben az időpontfoglalást követően szerződés jön létre, a szerződéses adatok kezelésére a szerződés és a vonatkozó jogszabályok (így különösen a számvitelről szóló 2000. évi C. törvény 169. § (2) bekezdése szerinti 8 éves megőrzési kötelezettség) irányadók.
 4. Az érintettek adatkezeléssel kapcsolatos jogainak ismertetése:
    - Az érintett kérelmezheti az adatkezelőtől a rá vonatkozó személyes adatokhoz való hozzáférést, azok helyesbítését, törlését vagy kezelésének korlátozását, és
@@ -178,7 +178,7 @@ Adatkezelő a közösségi oldalon privát üzenetben kizárólag akkor kommunik
 | Adatfeldolgozói tevékenység | Név, cím, elérhetőség |
 |---|---|
 | Tárhely-szolgáltatás, az időpontfoglalások tárolása a szerveren | Tárhely.Eu Kft. Telefon: +36 1 789 2 789, fax: +36 1 789 3 789, e-mail: support@tarhely.eu, posta: 1538 Budapest, Pf.: 510. |
-| Az időpontfoglalással kapcsolatos e-mailek (visszaigazolás, értesítés) továbbítása | fws online Zrt. Cím: 9444 Fertőszentmiklós, Petőfi utca 44., e-mail: ugyfelszolgalat@fws.hu. |
+| Az időpontfoglalással kapcsolatos e-mailek (visszaigazolás, értesítés, lemondás) továbbítása | fws online Zrt. Cím: 9444 Fertőszentmiklós, Petőfi utca 44., e-mail: ugyfelszolgalat@fws.hu. |
 | A látogatottság mérése (Google Tag Manager, Google Analytics), hozzájárulás alapján | Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Írország. Adatvédelmi nyilatkozat: https://policies.google.com/privacy |
 
 3. Adattovábbítás harmadik fél részére

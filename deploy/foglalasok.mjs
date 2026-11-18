@@ -1,8 +1,8 @@
-// Parancssori segéd a foglalásokhoz, mert nincs admin felület:
+// Parancssori segéd a foglalásokhoz. A napi munka (lista, lemondás, telefonos foglalás) az admin
+// felületen megy (https://dankuchenkaposvar.hu/admin/), ez a végleges törléshez és vészhelyzetre való:
 //   sudo -u dankuchen node /opt/dankuchen/foglalasok.mjs lista        közelgő foglalások azonosítóval
 //   sudo -u dankuchen node /opt/dankuchen/foglalasok.mjs lista mind   minden tárolt foglalás, a lemondottak is
 //   sudo -u dankuchen node /opt/dankuchen/foglalasok.mjs torol 12     egy foglalás végleges törlése (törlési kérelemre)
-// Lemondáshoz nem ez kell, hanem a `lemondottFoglalasok` lista a foglalas.json-ban.
 import { DatabaseSync } from 'node:sqlite';
 
 const DB = process.env.DB_PATH ?? '/var/lib/dankuchen/foglalasok.db';
@@ -16,7 +16,7 @@ if (parancs === 'lista') {
       ? db.prepare('SELECT * FROM foglalas ORDER BY nap, ora').all()
       : db.prepare('SELECT * FROM foglalas WHERE lemondva IS NULL AND nap >= ? ORDER BY nap, ora').all(ma);
   for (const s of sorok) {
-    console.log(`${s.id}\t${s.nap} ${s.ora}\t${s.nev}\t${s.telefon}\t${s.email}${s.telepules ? `\t${s.telepules}` : ''}${s.lemondva ? '\tLEMONDVA' : ''}`);
+    console.log(`${s.id}\t${s.nap} ${s.ora}\t${s.nev}\t${s.telefon}\t${s.email || '–'}${s.telepules ? `\t${s.telepules}` : ''}${s.forras === 'telefon' ? '\tTELEFONOS' : ''}${s.lemondva ? '\tLEMONDVA' : ''}`);
     if (s.uzenet) console.log(`\t${s.uzenet.replace(/\s+/g, ' ')}`);
   }
   console.log(`${sorok.length} foglalás`);

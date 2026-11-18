@@ -1,14 +1,5 @@
 {
-  "hetNapjai": [1, 2, 3, 4, 5],
-  "kezdoOrak": ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"],
-  "hosszPerc": 60,
-  "legkorabbanNapMulva": 1,
-  "legkesobbNapMulva": 56,
-  "maxAktivFoglalas": 2,
-  "pihenonapok": ["2026-12-24"],
-  "zarvaIdoszakok": [],
-  "zartOrak": [],
-  "lemondottFoglalasok": [],
+  "oldalCim": "https://dankuchenkaposvar.hu",
   "email": {
     "smtpHost": "mail.fws.hu",
     "smtpPort": 587,
@@ -16,8 +7,8 @@
     "felhasznalo": "dan@lamello.hu",
     "feladoNev": "DANKÜCHEN Exkluzív Stúdió Kaposvár",
     "felado": "dan@lamello.hu",
-    "ertesitesiCimek": ["szabo.gergely@lamello.hu", "dan@lamello.hu"],
     "targyLatogatonak": "Időpontfoglalás visszaigazolása: {idopont}",
-    "targyStudionak": "Új időpontfoglalás: {idopont} – {nev}"
+    "targyStudionak": "Új időpontfoglalás: {idopont} – {nev}",
+    "targyLemondas": "Időpont lemondva: {idopont}"
   }
 }

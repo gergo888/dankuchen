@@ -30,7 +30,8 @@ function icsSor(sor: string) {
   return reszek.join('\r\n');
 }
 
-export function naptarFajl(f: Foglalas, sz: Beallitasok, cim: string, leiras: string, most: Date) {
+// Lemondáskor ugyanazzal az azonosítóval, `METHOD:CANCEL` értékkel megy, így a naptárprogramok többsége törli az eseményt.
+export function naptarFajl(f: Foglalas, sz: Beallitasok, cim: string, leiras: string, most: Date, lemondas = false) {
   const kezdes = utcIdopont(f.nap, f.ora);
   const vege = new Date(kezdes.getTime() + sz.hosszPerc * 60 * 1000);
   return (
@@ -38,9 +39,10 @@ export function naptarFajl(f: Foglalas, sz: Beallitasok, cim: string, leiras: st
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
       'PRODID:-//DANKUCHEN Kaposvar//Idopontfoglalas//HU',
-      'METHOD:PUBLISH',
+      lemondas ? 'METHOD:CANCEL' : 'METHOD:PUBLISH',
       'BEGIN:VEVENT',
       `UID:foglalas-${f.id}@dankuchen-kaposvar`,
+      ...(lemondas ? ['SEQUENCE:1', 'STATUS:CANCELLED'] : []),
       `DTSTAMP:${icsIdo(most)}`,
       `DTSTART:${icsIdo(kezdes)}`,
       `DTEND:${icsIdo(vege)}`,
@@ -55,11 +57,21 @@ export function naptarFajl(f: Foglalas, sz: Beallitasok, cim: string, leiras: st
   );
 }
 
+const KOVETKEZO_FOGLALAS = '/idopontfoglalas/';
+
+// A levelek közös részei. A tárgyba a név szó szerint kerül, a benne lévő jelek nem helyettesítődnek.
+function levelAlap(f: Foglalas, sz: Beallitasok) {
+  const idopont = `${napFelirat(f.nap)}, ${oraFelirat(f.ora, sz.hosszPerc)}`;
+  return {
+    idopont,
+    felado: { name: sz.email.feladoNev, address: sz.email.felado },
+    targy: (sablon: string) => sablon.replace(/\{(idopont|nev)\}/g, (_, kulcs) => (kulcs === 'nev' ? f.nev : idopont)),
+  };
+}
+
 // A látogatónak és a stúdiónak küldött levél. Sima szöveg, így a beírt adatok nem értelmeződnek HTML-ként.
 export function levelek(f: Foglalas, sz: Beallitasok, most: Date) {
-  const idopont = `${napFelirat(f.nap)}, ${oraFelirat(f.ora, sz.hosszPerc)}`;
-  const felado = { name: sz.email.feladoNev, address: sz.email.felado };
-  const targy = (sablon: string) => sablon.replace(/\{(idopont|nev)\}/g, (_, kulcs) => (kulcs === 'nev' ? f.nev : idopont));
+  const { idopont, felado, targy } = levelAlap(f, sz);
   const melleklet = (cim: string, leiras: string) => [
     { filename: 'idopont.ics', content: naptarFajl(f, sz, cim, leiras, most), contentType: 'text/calendar; charset=utf-8; method=PUBLISH' },
   ];
@@ -94,7 +106,7 @@ export function levelek(f: Foglalas, sz: Beallitasok, most: Date) {
     'Üzenet:',
     f.uzenet || '–',
     '',
-    `Lemondáskor az azonosítót (${f.id}) a foglalas.json lemondottFoglalasok listájába kell felvenni, a látogatót pedig értesíteni kell.`,
+    `Részletek és lemondás: ${sz.oldalCim}/admin/foglalas/${f.id}`,
   ].join('\n');
 
   return {
@@ -107,7 +119,7 @@ export function levelek(f: Foglalas, sz: Beallitasok, most: Date) {
     },
     studio: {
       from: felado,
-      to: sz.email.ertesitesiCimek,
+      to: sz.ertesitesiCimek,
       replyTo: f.email,
       subject: targy(sz.email.targyStudionak),
       text: studioSzoveg,
@@ -116,12 +128,46 @@ export function levelek(f: Foglalas, sz: Beallitasok, most: Date) {
   };
 }
 
-// A foglalás a levél sikerétől függetlenül érvényes, ezért a hiba csak a naplóba kerül.
-export async function levelekKuldese(f: Foglalas, sz: Beallitasok, most: Date) {
+// A stúdió lemondta az időpontot. Az indoklás (ha van) szó szerint kerül a levélbe.
+export function lemondoLevel(f: Foglalas, sz: Beallitasok, indok: string, most: Date) {
+  const { idopont, felado, targy } = levelAlap(f, sz);
+  const szoveg = [
+    `Kedves ${f.nev}!`,
+    '',
+    `Sajnos le kellett mondanunk a látványtervezési időpontodat: ${idopont}.`,
+    ...(indok ? ['', indok] : []),
+    '',
+    `Új időpontot itt foglalhatsz: ${sz.oldalCim}${KOVETKEZO_FOGLALAS}`,
+    `Vagy hívj minket: ${studio.telefon}`,
+    '',
+    'Elnézést a kellemetlenségért!',
+    '',
+    'Üdvözlettel:',
+    studio.nev,
+  ].join('\n');
+  return {
+    from: felado,
+    to: f.email,
+    subject: targy(sz.email.targyLemondas),
+    text: szoveg,
+    attachments: [
+      {
+        filename: 'idopont.ics',
+        content: naptarFajl(f, sz, 'Látványtervezés – DANKÜCHEN Kaposvár', 'Lemondva', most, true),
+        contentType: 'text/calendar; charset=utf-8; method=CANCEL',
+      },
+    ],
+  };
+}
+
+export type KuldesEredmeny = 'elkuldve' | 'nincs-smtp' | 'hiba';
+
+// A levelek sorban, egy kapcsolaton mennek ki. A hiba csak a naplóba kerül, a foglalás ettől érvényes marad.
+async function kuldes(sz: Beallitasok, leiras: string, uzenetek: { nev: string; level: object }[]): Promise<KuldesEredmeny> {
   const jelszo = process.env.SMTP_JELSZO;
   if (!jelszo) {
-    console.warn(`[foglalas] nincs SMTP_JELSZO, a(z) ${f.id}. foglalás levelei nem mentek ki`);
-    return;
+    console.warn(`[foglalas] nincs SMTP_JELSZO, ${leiras} levelei nem mentek ki`);
+    return 'nincs-smtp';
   }
   const kuldo = nodemailer.createTransport({
     host: sz.email.smtpHost,
@@ -132,9 +178,31 @@ export async function levelekKuldese(f: Foglalas, sz: Beallitasok, most: Date) {
     connectionTimeout: 15000,
     socketTimeout: 30000,
   });
-  const { latogato, studio: studioLevel } = levelek(f, sz, most);
-  const eredmenyek = await Promise.allSettled([kuldo.sendMail(latogato), kuldo.sendMail(studioLevel)]);
+  const eredmenyek = await Promise.allSettled(uzenetek.map((u) => kuldo.sendMail(u.level)));
+  let hibas = false;
   eredmenyek.forEach((e, i) => {
-    if (e.status === 'rejected') console.error(`[foglalas] a(z) ${f.id}. foglalás ${i === 0 ? 'látogatói' : 'stúdió'} levele nem ment ki:`, e.reason?.message);
+    if (e.status === 'rejected') {
+      hibas = true;
+      console.error(`[foglalas] ${leiras} ${uzenetek[i].nev} levele nem ment ki:`, e.reason?.message);
+    }
   });
+  return hibas ? 'hiba' : 'elkuldve';
+}
+
+// Webes foglalás: visszaigazolás a látogatónak, értesítés a stúdiónak.
+export function levelekKuldese(f: Foglalas, sz: Beallitasok, most: Date) {
+  const { latogato, studio: studioLevel } = levelek(f, sz, most);
+  return kuldes(sz, `a(z) ${f.id}. foglalás`, [
+    { nev: 'látogatói', level: latogato },
+    { nev: 'stúdió', level: studioLevel },
+  ]);
+}
+
+// Telefonos foglalás: csak a látogató kap visszaigazolást, a stúdió maga rögzítette.
+export function visszaigazolasKuldese(f: Foglalas, sz: Beallitasok, most: Date) {
+  return kuldes(sz, `a(z) ${f.id}. foglalás`, [{ nev: 'látogatói', level: levelek(f, sz, most).latogato }]);
+}
+
+export function lemondoLevelKuldese(f: Foglalas, sz: Beallitasok, indok: string, most: Date) {
+  return kuldes(sz, `a(z) ${f.id}. foglalás lemondásának`, [{ nev: 'látogatói', level: lemondoLevel(f, sz, indok, most) }]);
 }
