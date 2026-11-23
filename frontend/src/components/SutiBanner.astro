@@ -1,5 +1,6 @@
 ---
-// Sütihozzájárulás: Google Consent Mode v2 (a beállítások és az alapérték: utils/google.ts, Layout.astro <head>).
+// Sütihozzájárulás: Google Consent Mode v2 és a Meta Pixel (a beállítások és az alapérték: utils/google.ts,
+// utils/meta.ts, Layout.astro <head>).
 // Csak akkor jelenik meg, ha nincs érvényes tárolt választás. A lábléc „Süti-beállítások” gombja újranyitja.
 import { HOZZAJARULAS_ERVENYES_NAP, HOZZAJARULAS_KULCS, HOZZAJARULAS_VERZIO } from '../utils/google';
 ---
@@ -14,7 +15,7 @@ import { HOZZAJARULAS_ERVENYES_NAP, HOZZAJARULAS_KULCS, HOZZAJARULAS_VERZIO } fr
       <legend class="sr-only">Sütikategóriák</legend>
       <label><input type="checkbox" checked disabled /> <span><strong>Szükséges</strong> – a választásod tárolása, mindig aktív</span></label>
       <label><input type="checkbox" name="statisztika" /> <span><strong>Statisztika</strong> – Google Analytics: a látogatottság mérése</span></label>
-      <label><input type="checkbox" name="marketing" /> <span><strong>Marketing</strong> – Google Ads: a hirdetések eredményességének mérése</span></label>
+      <label><input type="checkbox" name="marketing" /> <span><strong>Marketing</strong> – Google Ads és Meta (Facebook, Instagram): hirdetéseink eredményességének mérése és személyre szabása</span></label>
     </fieldset>
     <div class="suti__gombok">
       <button type="button" class="gomb suti__gomb" data-suti="elfogad">Mindet elfogadom</button>
@@ -28,6 +29,7 @@ import { HOZZAJARULAS_ERVENYES_NAP, HOZZAJARULAS_KULCS, HOZZAJARULAS_VERZIO } fr
 <script>
   type Valasztas = { statisztika: boolean; marketing: boolean };
   type Gtag = (...args: unknown[]) => void;
+  type MetaPixel = (be: boolean) => void;
 
   const banner = document.querySelector<HTMLElement>('.suti')!;
   const cim = banner.querySelector<HTMLElement>('.suti__cim')!;
@@ -68,9 +70,12 @@ import { HOZZAJARULAS_ERVENYES_NAP, HOZZAJARULAS_KULCS, HOZZAJARULAS_VERZIO } fr
     }
     const s = v.statisztika ? 'granted' : 'denied';
     const m = v.marketing ? 'granted' : 'denied';
-    (window as unknown as { gtag?: Gtag }).gtag?.('consent', 'update', { analytics_storage: s, ad_storage: m, ad_user_data: m, ad_personalization: m });
+    const w = window as unknown as { gtag?: Gtag; metaPixel?: MetaPixel };
+    w.gtag?.('consent', 'update', { analytics_storage: s, ad_storage: m, ad_user_data: m, ad_personalization: m });
+    // A Meta Pixel elfogadáskor rögtön betöltődik, visszavonáskor leáll.
+    w.metaPixel?.(v.marketing);
     if (!v.statisztika) sutikTorlese(/^_ga(_|$)/);
-    if (!v.marketing) sutikTorlese(/^_gcl_/);
+    if (!v.marketing) sutikTorlese(/^(_gcl_|_fbp$|_fbc$)/);
     bezar();
   }
 

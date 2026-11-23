@@ -81,15 +81,22 @@ Az adatkezelő nyilatkozik, hogy adatkezelése a jelen pontban foglalt alapelvek
 3. **Látogatottságmérés (Google Analytics 4).** A weboldal látogatottságát a Google Tag Manager és a Google Analytics 4 szolgáltatással mérjük. Szolgáltató: Google Ireland Limited (Gordon House, Barrow Street, Dublin 4, Írország; „Google”).
    - Az adatkezelés célja: a látogatottság és az oldalhasználat összesített mérése a weboldal fejlesztése érdekében.
    - A kezelt adatok köre: álnevesített, véletlenszerű azonosító; a megtekintett oldalak és a kapcsolódó események (pl. görgetés, kimenő hivatkozásra kattintás, fájlletöltés, űrlapok használata); az eszköz és a böngésző típusa, a képernyő mérete, a nyelv; a hivatkozó oldal; az IP-címből megállapított hozzávetőleges földrajzi hely. A Google Analytics az IP-címet nem tárolja.
-   - Sütik: `_ga` és `_ga_4Q2ZK32E1J` (a látogatók megkülönböztetésére, 2 évig).
+   - Sütik: `_ga` és `_ga_GM7398BY4M` (a látogatók megkülönböztetésére, 2 évig).
    - Megőrzési idő: a Google Analyticsben beállított időtartamig, legfeljebb 14 hónapig.
 4. **Hirdetésmérés (Google Ads).** A Google Analytics fiókunk össze van kapcsolva a Google Ads fiókunkkal. Hozzájárulás esetén a Google a hirdetéseink eredményességének mérésére (konverziómérés) és a hirdetések személyre szabására is felhasználhatja az adatokat.
    - Süti: `_gcl_au` (a hirdetésre kattintás és a látogatás összekapcsolására, 90 napig).
-5. **Mérés hozzájárulás nélkül (Google Consent Mode).** A weboldal a Google hozzájárulási módját (Consent Mode) használja. Ha Ön nem járul hozzá, a weboldal statisztikai vagy marketing célú sütit nem helyez el és nem olvas ki. A Google ilyenkor csak sütik és tartós azonosító nélküli jelzéseket kap (pl. az oldalletöltés ténye és időpontja, a böngésző típusa, a hozzájárulás állapota), amelyeket a látogatottság összesített, statisztikai becsléséhez használ. Ennek jogalapja az adatkezelő jogos érdeke a weboldal használatának összesített mérésére (GDPR 6. cikk (1) bekezdés f) pont).
-6. **Adattovábbítás harmadik országba.** A Google az adatokat az Amerikai Egyesült Államokban is kezelheti. A Google LLC az EU–USA Adatvédelmi Keretrendszer alapján tanúsítvánnyal rendelkezik, amelyről az Európai Bizottság 2023. július 10-én megfelelőségi határozatot fogadott el. A Google adatkezeléséről: https://policies.google.com/privacy és https://business.safety.google/privacy/
-7. **Google Térkép.** A Kapcsolat oldalon beágyazott Google Térkép a Google szolgáltatása. A térkép betöltésekor a Google saját sütiket helyezhet el, és megkaphatja a látogató IP-címét. Ezekre az adatkezelésekre a Google adatvédelmi nyilatkozata vonatkozik: https://policies.google.com/privacy
-8. Az érintetteknek lehetőségük van a cookie-kat törölni a böngészők Eszközök/Beállítások menüjében, általában az Adatvédelem menüpont beállításai alatt.
-9. A legtöbb böngésző, amelyet felhasználóink használnak, lehetővé teszi annak beállítását, hogy mely cookie-kat kell menteni, és lehetővé teszi, hogy (meghatározott) cookie-k újra törlésre kerüljenek. Itt talál információkat arra vonatkozóan, hogy a szokásos böngészők esetében hogyan tudja a cookie beállításokat testre szabni:
+5. **Hirdetésmérés a Facebookon és az Instagramon (Meta Pixel).** Hozzájárulás esetén a weboldalon a Meta Pixel fut. Szolgáltató: Meta Platforms Ireland Limited (Merrion Road, Dublin 4, D04 X2K5, Írország; „Meta”).
+   - Az adatkezelés célja: a Facebookon és az Instagramon futó hirdetéseink eredményességének mérése (például hányan látogattak el a weboldalra egy hirdetés után), a hirdetések megjelenítése a weboldal látogatóinak (újracélzás), valamint a hirdetések optimalizálása.
+   - A kezelt adatok köre: a megtekintett oldal címe és a hivatkozó oldal, az esemény (oldalmegtekintés), az IP-cím, a böngésző és az eszköz adatai, valamint a sütikben tárolt azonosítók. Ha a látogató be van jelentkezve a Facebookra vagy az Instagramra, a Meta az adatokat a fiókjához kapcsolhatja.
+   - Sütik: `_fbp` (a böngésző azonosítására, 90 napig), `_fbc` (ha a látogató Meta-hirdetésre kattintva érkezett, 90 napig), valamint a Meta saját domainjén elhelyezett sütik (például `fr`).
+   - Közös adatkezelés: az adatok gyűjtése és a Meta részére történő továbbítása tekintetében az adatkezelő és a Meta közös adatkezelők (GDPR 26. cikk). A feladatok megosztását a Meta adatkezelői kiegészítése tartalmazza: https://www.facebook.com/legal/controller_addendum. Az adatok további kezelését a Meta önálló adatkezelőként végzi, saját adatvédelmi irányelvei szerint: https://www.facebook.com/privacy/policy/
+   - Megőrzési idő: a hirdetési célközönségekben legfeljebb 180 napig. A Meta által kezelt adatokra a Meta adatvédelmi irányelvei irányadók.
+   - Hozzájárulás nélkül a Meta Pixel nem töltődik be, így a Meta a weboldal látogatásáról semmilyen adatot nem kap.
+6. **Mérés hozzájárulás nélkül (Google Consent Mode).** A weboldal a Google hozzájárulási módját (Consent Mode) használja. Ha Ön nem járul hozzá, a weboldal statisztikai vagy marketing célú sütit nem helyez el és nem olvas ki. A Google ilyenkor csak sütik és tartós azonosító nélküli jelzéseket kap (pl. az oldalletöltés ténye és időpontja, a böngésző típusa, a hozzájárulás állapota), amelyeket a látogatottság összesített, statisztikai becsléséhez használ. A Meta Pixel hozzájárulás nélkül egyáltalán nem töltődik be. A Google részére küldött jelzések jogalapja az adatkezelő jogos érdeke a weboldal használatának összesített mérésére (GDPR 6. cikk (1) bekezdés f) pont).
+7. **Adattovábbítás harmadik országba.** A Google az adatokat az Amerikai Egyesült Államokban is kezelheti. A Google LLC az EU–USA Adatvédelmi Keretrendszer alapján tanúsítvánnyal rendelkezik, amelyről az Európai Bizottság 2023. július 10-én megfelelőségi határozatot fogadott el. A Google adatkezeléséről: https://policies.google.com/privacy és https://business.safety.google/privacy/ A Meta az adatokat szintén kezelheti az Amerikai Egyesült Államokban. A Meta Platforms, Inc. ugyancsak rendelkezik az EU–USA Adatvédelmi Keretrendszer szerinti tanúsítvánnyal.
+8. **Google Térkép.** A Kapcsolat oldalon beágyazott Google Térkép a Google szolgáltatása. A térkép betöltésekor a Google saját sütiket helyezhet el, és megkaphatja a látogató IP-címét. Ezekre az adatkezelésekre a Google adatvédelmi nyilatkozata vonatkozik: https://policies.google.com/privacy
+9. Az érintetteknek lehetőségük van a cookie-kat törölni a böngészők Eszközök/Beállítások menüjében, általában az Adatvédelem menüpont beállításai alatt.
+10. A legtöbb böngésző, amelyet felhasználóink használnak, lehetővé teszi annak beállítását, hogy mely cookie-kat kell menteni, és lehetővé teszi, hogy (meghatározott) cookie-k újra törlésre kerüljenek. Itt talál információkat arra vonatkozóan, hogy a szokásos böngészők esetében hogyan tudja a cookie beállításokat testre szabni:
    - Google Chrome (https://support.google.com/chrome/answer/95647?hl=hu)
    - Microsoft Edge (https://support.microsoft.com/hu-hu/microsoft-edge)
    - Firefox (https://support.mozilla.org/hu/kb/sutik-engedelyezese-es-tiltasa-amit-weboldak-haszn)
@@ -189,6 +196,7 @@ Adatkezelő a közösségi oldalon privát üzenetben kizárólag akkor kommunik
 |---|---|
 | Térkép megjelenítése a Kapcsolat oldalon (Google Térkép) | Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Írország. Adatvédelmi nyilatkozat: https://policies.google.com/privacy |
 | Hirdetésmérés és a hirdetések személyre szabása (Google Ads), hozzájárulás alapján | Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Írország. Adatvédelmi nyilatkozat: https://policies.google.com/privacy |
+| Hirdetésmérés, újracélzás és a hirdetések optimalizálása a Facebookon és az Instagramon (Meta Pixel), hozzájárulás alapján; az adatgyűjtés és -továbbítás tekintetében közös adatkezelő | Meta Platforms Ireland Limited, Merrion Road, Dublin 4, D04 X2K5, Írország. Adatvédelmi irányelvek: https://www.facebook.com/privacy/policy/ |
 
 ## 11. Az érintettek jogai
 
@@ -292,4 +300,4 @@ A tájékoztató elkészítése során figyelemmel voltunk az alábbi jogszabál
 - 2003\. évi C. törvény az elektronikus hírközlésről (kifejezetten a 155. §-a);
 - A Nemzeti Adatvédelmi és Információszabadság Hatóság ajánlása az előzetes tájékoztatás adatvédelmi követelményeiről.
 
-Hatályos: 2026. november 18-tól.
+Hatályos: 2026. november 23-tól.

@@ -3,16 +3,21 @@
 // A tárolóban (GTM-PCN2CJD3) egy GA4-mérés van Google Ads-összekapcsolással, ezért két kategória kell:
 // statisztika → analytics_storage, marketing → ad_storage, ad_user_data, ad_personalization.
 
+import { metaPixelSzkript } from './meta';
+
 export const GTM_AZONOSITO = 'GTM-PCN2CJD3';
 
 // A választás a böngésző helyi tárhelyén (nem sütiben). A verzió növelésével, például új kategória vagy
 // lényegesen módosított tájékoztató esetén, mindenkitől újra hozzájárulást kérünk.
 export const HOZZAJARULAS_KULCS = 'dankuchen-suti';
-export const HOZZAJARULAS_VERZIO = 1;
+// 2: a Meta Pixel bekerült a marketing kategóriába (2026-11-23), a korábbi hozzájárulás csak a Google Ads-re szólt.
+export const HOZZAJARULAS_VERZIO = 2;
 export const HOZZAJARULAS_ERVENYES_NAP = 365;
 
 // A GTM 2026-os telepítőkódja (gtag('js') és a gtm.js?id= cím), egyetlen szkriptben a hozzájárulással.
 // Sorrend a dokumentáció szerint: alapérték (minden tiltva), a tárolt választás visszaállítása, a GTM indítása.
+//
+// A Meta Pixel (utils/meta.ts) marketing-hozzájárulás esetén ugyanekkor indul.
 //
 // A gtm.js (kb. 200 KB) csak akkor töltődik be, ha az oldal betöltődött (load) ÉS a fő tartalom (LCP,
 // a nyitókép) kirajzolódott, utána üresjáratban. Így nem versenyez a betűtípusokkal és a nyitóképpel,
@@ -25,14 +30,17 @@ window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied' });
 gtag('set', 'ads_data_redaction', true);
+var marketing = false;
 try {
   var v = JSON.parse(localStorage.getItem(${JSON.stringify(HOZZAJARULAS_KULCS)}) || 'null');
   if (v && v.verzio === ${HOZZAJARULAS_VERZIO} && Date.now() - v.ido < ${HOZZAJARULAS_ERVENYES_NAP} * 864e5) {
     var s = v.statisztika ? 'granted' : 'denied', m = v.marketing ? 'granted' : 'denied';
     gtag('consent', 'update', { analytics_storage: s, ad_storage: m, ad_user_data: m, ad_personalization: m });
+    marketing = !!v.marketing;
   }
 } catch (e) {}
 gtag('js', new Date());
+${metaPixelSzkript()}
 (function () {
   var betoltve = false, kirajzolva = false, utemezve = false;
   function gtm() {
@@ -40,6 +48,7 @@ gtag('js', new Date());
     j.async = true;
     j.src = 'https://www.googletagmanager.com/gtm.js?id=${GTM_AZONOSITO}';
     document.head.appendChild(j);
+    if (marketing) window.metaPixel(true);
   }
   function probal() {
     if (!betoltve || !kirajzolva || utemezve) return;
