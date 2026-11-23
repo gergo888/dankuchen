@@ -1,7 +1,8 @@
 // Google Tag Manager és a sütihozzájárulás (Google Consent Mode v2, haladó mód).
 // Dokumentáció: https://developers.google.com/tag-platform/security/guides/consent?consentmode=advanced
-// A tárolóban (GTM-PCN2CJD3) egy GA4-mérés van Google Ads-összekapcsolással, ezért két kategória kell:
-// statisztika → analytics_storage, marketing → ad_storage, ad_user_data, ad_personalization.
+// A tárolóban (GTM-PCN2CJD3) egy GA4-mérés van (G-GM7398BY4M), Google Ads-összekötés nélkül. Két kategória:
+// statisztika → analytics_storage; marketing → a Meta Pixel (utils/meta.ts) és a Google hirdetési jelzései
+// (ad_storage, ad_user_data, ad_personalization).
 
 import { metaPixelSzkript } from './meta';
 
