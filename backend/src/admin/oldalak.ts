@@ -167,10 +167,7 @@ export function listaOldal(o: {
     aktiv: 'foglalasok',
     csrf: o.csrf,
     uzenet: o.uzenet,
-    tartalom: html`<div class="fejlec">
-  <h1>Foglalások</h1>
-  <a class="gomb" href="/admin/uj">Új foglalás</a>
-</div>
+    tartalom: html`<h1>Foglalások</h1>
 <nav class="fulek" aria-label="Foglalások szűrése">
   ${NEZETEK.map(([nezet, felirat]) => html`<a href="${link(nezet)}"${nezet === o.nezet ? html` aria-current="page"` : ''}>${felirat}</a>`)}
 </nav>

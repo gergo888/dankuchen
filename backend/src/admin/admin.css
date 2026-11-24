@@ -131,18 +131,6 @@ h2 {
 .tartalom {
   padding-block: 24px 64px;
 }
-.fejlec {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-.fejlec h1 {
-  margin: 0;
-}
-
 .kartya {
   background: var(--feher);
   border: 1px solid var(--vonal);
