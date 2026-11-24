@@ -93,14 +93,19 @@ h2 {
 .menu ul {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 4px 20px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
+/* A linkek és a Kilépés gomb egyforma blokkdobozok, így egy vonalba kerülnek (a beágyazott link
+   függőleges belső margója nem számít bele a sor magasságába, a gombé igen). */
 .menu a,
 .menu .link {
+  display: block;
   color: var(--feher);
+  line-height: 1.5;
   text-decoration: none;
   padding-block: 6px;
   border-bottom: 2px solid transparent;
@@ -110,10 +115,9 @@ h2 {
 }
 .menu a:hover,
 .menu .link:hover {
-  text-decoration: underline;
+  opacity: 0.8;
 }
 .menu form {
-  display: inline;
   margin: 0;
 }
 

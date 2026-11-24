@@ -35,7 +35,7 @@ export function keret({ cim, tartalom, csrf, aktiv, uzenet }: { cim: string; tar
 <body>
 <header class="fej">
   <div class="tarolo fej__sor">
-    <a class="marka" href="/admin/">DANKÜCHEN <span>admin</span></a>
+    <a class="marka" href="/admin/">DANKÜCHEN <span>időpontfoglaló rendszer admin</span></a>
     ${
       csrf
         ? html`<nav class="menu" aria-label="Admin menü">
