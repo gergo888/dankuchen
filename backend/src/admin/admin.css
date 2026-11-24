@@ -74,7 +74,12 @@ h2 {
   gap: 8px 24px;
   padding-block: 12px;
 }
+/* A felirat doboza ugyanolyan magas, mint a menüpontoké (6px belső margó + 2px aktív vonal), így a
+   menü nélküli belépőoldalon is ugyanakkora a fejléc, és a szöveg is ugyanabban a magasságban áll. */
 .marka {
+  display: block;
+  padding-block: 6px 8px;
+  line-height: 1.5;
   color: var(--feher);
   font-weight: 800;
   letter-spacing: 0.04em;
