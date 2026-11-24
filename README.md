@@ -342,6 +342,30 @@ sudo -u dankuchen node /opt/dankuchen/foglalasok.mjs lista    # közelgő foglal
 node /opt/dankuchen/backend/admin-jelszo.ts                     # az admin felhasználóneve és jelszava
 ```
 
+### Az adatbázis megnyitása DBeaverrel
+
+Az SQLite egy fájl a szerveren, nincs hálózati elérése, ezért a DBeaver távolról nem tud rá csatlakozni. A DBeaver SSH-alagútja csak szerveres adatbázisokhoz (MySQL, PostgreSQL) jó. Az éles fájlt SSHFS-en át megnyitni sem szabad: WAL módban fut, és hálózati fájlrendszeren a zárolás nem működik, az adatbázis megsérülhet.
+
+Ehelyett egy friss pillanatkép jön le a saját gépre:
+
+```sh
+deploy/adatbazis-letoltes.sh    # ~/dankuchen-adatbazis/foglalasok.db, vagy a megadott helyre
+```
+
+A másolat a napi mentés módszerével készül (`VACUUM INTO`), a futó oldal mellett is biztonságos. Egyetlen fájl, WAL nélkül, és csak a tulajdonos olvashatja. Ügyfelek személyes adatai vannak benne, ezért a gépről sem szabad továbbadni.
+
+A kapcsolat létrehozása DBeaverben:
+
+1. *Database → New Database Connection → SQLite*. Első alkalommal a DBeaver felajánlja az SQLite-meghajtó letöltését.
+2. *Path*: a letöltött fájl teljes útvonala, például `/home/<felhasználó>/dankuchen-adatbazis/foglalasok.db`.
+3. A kapcsolat beállításainál (*General*) érdemes bekapcsolni a *Read-only connection* opciót. A másolatban végzett módosítás úgysem kerül vissza a szerverre: az éles adatokat az admin felületen kell módosítani.
+
+Friss adatokhoz újra kell futtatni a szkriptet, utána a DBeaverben a kapcsolaton *Disconnect*, majd újracsatlakozás (vagy *Invalidate/Reconnect*). A táblák:
+
+- `foglalas`: a foglalások;
+- `beallitasok`: a foglalási beállítások, JSON-ban;
+- `munkamenet`: az admin belépései, csak a tokenek hash-ével.
+
 ### Hol mit lehet módosítani
 
 | Mit | Hol | Utána |
